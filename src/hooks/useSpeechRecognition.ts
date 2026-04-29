@@ -23,7 +23,7 @@ export function useSpeechRecognition(language: string = 'en-US') {
   });
 
   const recognitionRef = useRef<any>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const recordingTimeRef = useRef<number>(0);
 
   useEffect(() => {

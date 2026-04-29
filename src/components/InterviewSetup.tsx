@@ -1,4 +1,3 @@
-import React from 'react';
 import type { InterviewState } from '../types/index';
 import CameraPanel from './CameraPanel';
 
