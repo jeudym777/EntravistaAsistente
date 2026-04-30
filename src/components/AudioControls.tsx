@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 
 interface AudioControlsProps {
@@ -14,6 +14,7 @@ export default function AudioControls({
   transcript,
   onTranscriptFinalized,
 }: AudioControlsProps) {
+  const [isStopped, setIsStopped] = useState(false);
   const languageCode = language === 'es' ? 'es-ES' : 'en-US';
   const {
     isListening,
@@ -62,30 +63,63 @@ export default function AudioControls({
         </div>
       )}
 
+      {/* Stopped - Waiting for confirmation */}
+      {isStopped && !isListening && speechTranscript && (
+        <div className="p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg">
+          <p className="text-yellow-300 text-sm font-semibold mb-2">📝 Review your answer:</p>
+          <p className="text-yellow-200 text-sm leading-relaxed bg-black/30 p-2 rounded max-h-24 overflow-y-auto">
+            {speechTranscript}
+          </p>
+        </div>
+      )}
+
       {/* Controls */}
       <div className="flex gap-2">
-        {!isListening ? (
+        {isListening ? (
+          // Recording - show Stop button
+          <button
+            onClick={() => {
+              stopListening();
+              setIsStopped(true);
+            }}
+            className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition text-lg"
+          >
+            ⏹️ Stop Recording
+          </button>
+        ) : isStopped && speechTranscript ? (
+          // Stopped - show Send and Cancel buttons
+          <>
+            <button
+              onClick={() => {
+                setIsStopped(false);
+                setTimeout(() => {
+                  onTranscriptFinalized?.();
+                }, 500);
+              }}
+              className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition text-lg"
+            >
+              ✓ Send Answer
+            </button>
+            <button
+              onClick={() => {
+                setIsStopped(false);
+                resetTranscript();
+              }}
+              className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg transition text-lg"
+            >
+              ✕ Cancel
+            </button>
+          </>
+        ) : (
+          // Not recording - show Start button
           <button
             onClick={startListening}
             className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition text-lg"
           >
             🎤 Start Listening
           </button>
-        ) : (
-          <button
-            onClick={() => {
-              stopListening();
-              // Trigger auto-generate after delay to ensure transcript is updated
-              setTimeout(() => {
-                onTranscriptFinalized?.();
-              }, 800);
-            }}
-            className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition text-lg"
-          >
-            ⏹️ Stop & Generate
-          </button>
         )}
-        {transcript && (
+        {transcript && !isStopped && (
           <button
             onClick={resetTranscript}
             className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition"
