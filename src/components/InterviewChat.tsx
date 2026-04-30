@@ -20,8 +20,6 @@ export default function InterviewChat({
   const [currentTranscript, setCurrentTranscript] = useState('');
   const [transcriptToSend, setTranscriptToSend] = useState('');
 
-  const lastAnswer = messages.filter((m) => m.type === 'answer').pop();
-
   const handleGenerateAnswer = async (
     question: string = '',
     mode: 'default' | 'shorter' | 'technical' | 'natural' = 'default'
@@ -159,7 +157,6 @@ export default function InterviewChat({
             setCurrentTranscript(transcript);
             setTranscriptToSend(transcript);
           }}
-          transcript={currentTranscript}
           onTranscriptFinalized={() => {
             if (transcriptToSend.trim()) {
               handleGenerateAnswer(transcriptToSend, 'technical');

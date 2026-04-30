@@ -4,14 +4,12 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 interface AudioControlsProps {
   language: string;
   onTranscriptChange: (transcript: string) => void;
-  transcript: string;
   onTranscriptFinalized?: () => void;
 }
 
 export default function AudioControls({
   language,
   onTranscriptChange,
-  transcript,
   onTranscriptFinalized,
 }: AudioControlsProps) {
   const [localTranscript, setLocalTranscript] = useState('');
