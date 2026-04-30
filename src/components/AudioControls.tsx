@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 
 interface AudioControlsProps {
@@ -14,6 +14,7 @@ export default function AudioControls({
   transcript,
   onTranscriptFinalized,
 }: AudioControlsProps) {
+  const [localTranscript, setLocalTranscript] = useState('');
   const languageCode = language === 'es' ? 'es-ES' : 'en-US';
   const {
     isListening,
@@ -28,9 +29,25 @@ export default function AudioControls({
 
   React.useEffect(() => {
     if (speechTranscript) {
+      setLocalTranscript(speechTranscript);
       onTranscriptChange(speechTranscript);
     }
   }, [speechTranscript, onTranscriptChange]);
+
+  const handleStop = () => {
+    stopListening();
+    setTimeout(() => {
+      if (localTranscript.trim()) {
+        onTranscriptFinalized?.();
+      }
+    }, 500);
+  };
+
+  const handleClear = () => {
+    setLocalTranscript('');
+    resetTranscript();
+    onTranscriptChange('');
+  };
 
   if (!isSupported) {
     return (
@@ -62,6 +79,16 @@ export default function AudioControls({
         </div>
       )}
 
+      {/* Display captured transcript */}
+      {localTranscript && !isListening && (
+        <div className="p-3 bg-green-900/20 border border-green-700 rounded-lg">
+          <p className="text-green-300 text-xs font-semibold mb-2">📝 Captured:</p>
+          <p className="text-white text-sm bg-black/30 p-2 rounded max-h-24 overflow-y-auto">
+            {localTranscript}
+          </p>
+        </div>
+      )}
+
       {/* Controls */}
       <div className="flex gap-2">
         {!isListening ? (
@@ -73,21 +100,15 @@ export default function AudioControls({
           </button>
         ) : (
           <button
-            onClick={() => {
-              stopListening();
-              // Trigger auto-generate after short delay to ensure transcript is updated
-              setTimeout(() => {
-                onTranscriptFinalized?.();
-              }, 500);
-            }}
+            onClick={handleStop}
             className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition text-lg"
           >
             ⏹️ Stop & Generate
           </button>
         )}
-        {transcript && (
+        {localTranscript && (
           <button
-            onClick={resetTranscript}
+            onClick={handleClear}
             className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition"
           >
             🔄 Clear

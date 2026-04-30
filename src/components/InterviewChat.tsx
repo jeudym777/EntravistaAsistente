@@ -18,6 +18,7 @@ export default function InterviewChat({
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentTranscript, setCurrentTranscript] = useState('');
+  const [transcriptToSend, setTranscriptToSend] = useState('');
 
   const lastAnswer = messages.filter((m) => m.type === 'answer').pop();
 
@@ -25,7 +26,8 @@ export default function InterviewChat({
     question: string = '',
     mode: 'default' | 'shorter' | 'technical' | 'natural' = 'default'
   ) => {
-    const questionToUse = question || manualQuestion || currentTranscript;
+    // Use transcriptToSend first (from audio), then fallback to manual input
+    const questionToUse = question || manualQuestion || transcriptToSend;
 
     if (!questionToUse.trim()) {
       setError('Please provide a question first');
@@ -44,14 +46,15 @@ export default function InterviewChat({
 
     try {
       // Add question message if not already there
-      if (!manualQuestion && currentTranscript) {
+      if (!manualQuestion && transcriptToSend) {
         const questionId = 'q-' + Date.now();
         onAddMessage({
           id: questionId,
           type: 'question',
-          content: currentTranscript,
+          content: transcriptToSend,
           timestamp: new Date(),
         });
+        setTranscriptToSend('');
         setCurrentTranscript('');
       }
 
@@ -152,11 +155,14 @@ export default function InterviewChat({
         {/* Combined audio controls inside question box */}
         <AudioControls
           language={state.language}
-          onTranscriptChange={setCurrentTranscript}
+          onTranscriptChange={(transcript) => {
+            setCurrentTranscript(transcript);
+            setTranscriptToSend(transcript);
+          }}
           transcript={currentTranscript}
           onTranscriptFinalized={() => {
-            if (currentTranscript.trim()) {
-              handleGenerateAnswer(currentTranscript, 'technical');
+            if (transcriptToSend.trim()) {
+              handleGenerateAnswer(transcriptToSend, 'technical');
             }
           }}
         />
