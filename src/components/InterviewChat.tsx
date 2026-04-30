@@ -162,8 +162,9 @@ export default function InterviewChat({
             setTranscriptToSend(transcript);
           }}
           onTranscriptFinalized={() => {
+            // Populate the textarea with captured audio so user can review
             if (transcriptToSend.trim()) {
-              handleGenerateAnswer(transcriptToSend, 'technical');
+              setManualQuestion(transcriptToSend);
             }
           }}
         />
@@ -172,7 +173,7 @@ export default function InterviewChat({
       {/* Manual Question Input */}
       <div className="border-t border-gray-700 p-6 bg-gray-800">
         <label className="block text-sm font-semibold text-gray-300 mb-2">
-          Or type a question:
+          📝 Question (audio or manual):
         </label>
         <textarea
           value={manualQuestion}
@@ -180,13 +181,24 @@ export default function InterviewChat({
           placeholder="Type the interviewer's question here..."
           className="w-full h-20 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none mb-3"
         />
-        <button
-          onClick={() => handleGenerateAnswer(manualQuestion, 'default')}
-          disabled={isGenerating}
-          className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-lg transition text-lg"
-        >
-          ✨ Generate Answer
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleGenerateAnswer(manualQuestion, 'default')}
+            disabled={isGenerating || !manualQuestion.trim()}
+            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-lg transition text-lg"
+          >
+            ✨ Generate Answer
+          </button>
+          {manualQuestion.trim() && (
+            <button
+              onClick={() => setManualQuestion('')}
+              className="px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg transition"
+              title="Clear text"
+            >
+              ❌
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Answer Modification Buttons */}
