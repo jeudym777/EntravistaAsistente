@@ -104,13 +104,11 @@ export function useSpeechRecognition(language: string = 'en-US') {
             recognitionRef.current.start();
           } catch (e) {
             // Recognition is already started, ignore error
+            setState((prev) => ({
+              ...prev,
+              isListening: false,
+            }));
           }
-        } else {
-          // 120 seconds reached, stop listening
-          setState((prev) => ({
-            ...prev,
-            isListening: false,
-          }));
         }
       };
     } else {
@@ -137,10 +135,21 @@ export function useSpeechRecognition(language: string = 'en-US') {
     }
     // Set recording time to 120 to signal manual stop (prevent auto-restart)
     recordingTimeRef.current = 120;
-    if (recognitionRef.current && state.isListening) {
-      recognitionRef.current.stop();
+    
+    // Update state immediately
+    setState((prev) => ({
+      ...prev,
+      isListening: false,
+    }));
+    
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        // Ignore errors if recognition is not active
+      }
     }
-  }, [state.isListening]);
+  }, []);
 
   const resetTranscript = useCallback(() => {
     setState((prev) => ({

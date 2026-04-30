@@ -75,10 +75,10 @@ export default function AudioControls({
           <button
             onClick={() => {
               stopListening();
-              // Trigger auto-generate after short delay to ensure transcript is updated
+              // Trigger auto-generate after delay to ensure transcript is updated
               setTimeout(() => {
                 onTranscriptFinalized?.();
-              }, 500);
+              }, 800);
             }}
             className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition text-lg"
           >
