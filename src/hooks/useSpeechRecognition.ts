@@ -97,35 +97,43 @@ export function useSpeechRecognition(language: string = 'en-US') {
           clearInterval(timerRef.current);
         }
         
-        // If recording time is less than 120 seconds and user didn't manually stop,
-        // restart recording to keep it going
-        if (recordingTimeRef.current < 120) {
-          try {
-            recognitionRef.current.start();
-          } catch (e) {
-            // Recognition is already started, ignore error
-            setState((prev) => ({
-              ...prev,
-              isListening: false,
-            }));
-          }
-        }
+        setState((prev) => ({
+          ...prev,
+          isListening: false,
+        }));
       };
     } else {
       setState((prev) => ({ ...prev, isSupported: false }));
     }
 
     return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.abort();
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
       }
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch (e) {
+          // Ignore errors on cleanup
+        }
+      }
+      recordingTimeRef.current = 0;
     };
   }, [language]);
 
   const startListening = useCallback(() => {
     if (recognitionRef.current && !state.isListening) {
-      setState((prev) => ({ ...prev, transcript: '', error: null }));
-      recognitionRef.current.start();
+      try {
+        setState((prev) => ({ ...prev, transcript: '', error: null }));
+        recognitionRef.current.start();
+      } catch (err) {
+        console.error('Error starting recognition:', err);
+        setState((prev) => ({
+          ...prev,
+          error: 'Failed to start recording',
+          isListening: false,
+        }));
+      }
     }
   }, [state.isListening]);
 
