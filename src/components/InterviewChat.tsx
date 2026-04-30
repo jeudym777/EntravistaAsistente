@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { InterviewState, InterviewMessage } from '../types/index';
 import { generateInterviewAnswer } from '../services/openaiService';
 import AudioControls from './AudioControls';
@@ -17,7 +17,7 @@ export default function InterviewChat({
   const [manualQuestion, setManualQuestion] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentTranscript, setCurrentTranscript] = useState('');
+  const [transcriptToSend, setTranscriptToSend] = useState('');
 
   const lastAnswer = messages.filter((m) => m.type === 'answer').pop();
 
@@ -25,7 +25,7 @@ export default function InterviewChat({
     question: string = '',
     mode: 'default' | 'shorter' | 'technical' | 'natural' = 'default'
   ) => {
-    const questionToUse = question || manualQuestion || currentTranscript;
+    const questionToUse = question || manualQuestion || transcriptToSend;
 
     if (!questionToUse.trim()) {
       setError('Please provide a question first');
@@ -44,15 +44,15 @@ export default function InterviewChat({
 
     try {
       // Add question message if not already there
-      if (!manualQuestion && currentTranscript) {
+      if (!manualQuestion && transcriptToSend) {
         const questionId = 'q-' + Date.now();
         onAddMessage({
           id: questionId,
           type: 'question',
-          content: currentTranscript,
+          content: transcriptToSend,
           timestamp: new Date(),
         });
-        setCurrentTranscript('');
+        setTranscriptToSend('');
       }
 
       const answer = await generateInterviewAnswer({

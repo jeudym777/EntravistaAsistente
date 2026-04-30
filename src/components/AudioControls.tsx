@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 
 interface AudioControlsProps {
@@ -22,11 +21,9 @@ export default function AudioControls({
     recordingTime = 0,
   } = useSpeechRecognition(languageCode) as any;
 
-  React.useEffect(() => {
-    if (speechTranscript) {
-      onTranscriptChange(speechTranscript);
-    }
-  }, [speechTranscript, onTranscriptChange]);
+  if (speechTranscript) {
+    onTranscriptChange(speechTranscript);
+  }
 
   if (!isSupported) {
     return (
@@ -78,7 +75,7 @@ export default function AudioControls({
             ⏹️ Stop Listening
           </button>
         )}
-        {transcript && (
+        {speechTranscript && (
           <button
             onClick={resetTranscript}
             className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition"
