@@ -5,12 +5,14 @@ interface AudioControlsProps {
   language: string;
   onTranscriptChange: (transcript: string) => void;
   transcript: string;
+  onTranscriptFinalized?: () => void;
 }
 
 export default function AudioControls({
   language,
   onTranscriptChange,
   transcript,
+  onTranscriptFinalized,
 }: AudioControlsProps) {
   const languageCode = language === 'es' ? 'es-ES' : 'en-US';
   const {
@@ -71,10 +73,16 @@ export default function AudioControls({
           </button>
         ) : (
           <button
-            onClick={stopListening}
+            onClick={() => {
+              stopListening();
+              // Trigger auto-generate after short delay to ensure transcript is updated
+              setTimeout(() => {
+                onTranscriptFinalized?.();
+              }, 500);
+            }}
             className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition text-lg"
           >
-            ⏹️ Stop Listening
+            ⏹️ Stop & Generate
           </button>
         )}
         {transcript && (

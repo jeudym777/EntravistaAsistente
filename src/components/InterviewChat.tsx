@@ -160,6 +160,11 @@ export default function InterviewChat({
           language={state.language}
           onTranscriptChange={setCurrentTranscript}
           transcript={currentTranscript}
+          onTranscriptFinalized={() => {
+            if (currentTranscript.trim()) {
+              handleGenerateAnswer(currentTranscript, 'default');
+            }
+          }}
         />
       </div>
 
