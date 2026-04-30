@@ -81,7 +81,6 @@ export const presetsService = {
       throw new Error('Invalid CSV format');
     }
 
-    const headers = lines[0].split(',').map((h) => h.trim());
     const presets = presetsService.getAllPresets();
 
     // Simple CSV parsing (handles quoted fields)
