@@ -1,13 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { SpeechRecognitionState } from '../types/index';
 
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
-
 interface ExtendedSpeechRecognitionState extends SpeechRecognitionState {
   recordingTime: number;
 }
@@ -16,183 +9,153 @@ export function useSpeechRecognition(language: string = 'en-US') {
   const [state, setState] = useState<ExtendedSpeechRecognitionState>({
     isListening: false,
     transcript: '',
-    isSupported: false,
+    isSupported: true,
     error: null,
     isFinal: false,
     recordingTime: 0,
   });
 
-  const recognitionRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const recordingTimeRef = useRef<number>(0);
-  const interimTranscriptRef = useRef<string>('');
+  const streamRef = useRef<MediaStream | null>(null);
 
-  useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+  const startListening = useCallback(async () => {
+    try {
+      // Request microphone permission
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
 
-    if (SpeechRecognition) {
-      setState((prev) => ({ ...prev, isSupported: true }));
-      recognitionRef.current = new SpeechRecognition();
-      const recognition = recognitionRef.current;
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm',
+      });
+      audioChunksRef.current = [];
 
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = language;
-
-      recognition.onstart = () => {
-        recordingTimeRef.current = 0;
-        interimTranscriptRef.current = '';
-        setState((prev) => ({
-          ...prev,
+      mediaRecorder.onstart = () => {
+        setState({
           isListening: true,
-          error: null,
           transcript: '',
+          error: null,
           isFinal: false,
           recordingTime: 0,
-        }));
+          isSupported: true,
+        });
 
-        // Start timer - update every second and stop at 120 seconds
         timerRef.current = setInterval(() => {
-          recordingTimeRef.current += 1;
-          setState((prev) => ({
-            ...prev,
-            recordingTime: recordingTimeRef.current,
-          }));
-
-          // Stop recording after 120 seconds
-          if (recordingTimeRef.current >= 120) {
-            if (recognitionRef.current) {
-              try {
-                recognitionRef.current.stop();
-              } catch (e) {
-                // ignore
-              }
+          setState((prev) => {
+            const newTime = prev.recordingTime + 1;
+            if (newTime >= 120) {
+              mediaRecorder.stop();
+              return prev;
             }
-          }
+            return { ...prev, recordingTime: newTime };
+          });
         }, 1000);
       };
 
-      recognition.onresult = (event: any) => {
-        let interimTranscript = '';
-        
-        // Capture both interim and final results
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          
-          if (event.results[i].isFinal) {
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        if (timerRef.current) clearInterval(timerRef.current);
+
+        // Stop all tracks
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+
+        // Create blob from audio chunks
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+
+        if (audioBlob.size > 0) {
+          try {
+            // Send to OpenAI Whisper API
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'audio.webm');
+            formData.append('model', 'whisper-1');
+            formData.append('language', language === 'es-ES' ? 'es' : 'en');
+
+            const apiUrl = import.meta.env.PROD
+              ? '/api/whisper'
+              : 'https://api.openai.com/v1/audio/transcriptions';
+
+            const response = await fetch(apiUrl, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`Whisper API error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
             setState((prev) => ({
               ...prev,
-              transcript: (prev.transcript + ' ' + transcript).trim(),
+              transcript: data.text || '',
+              isListening: false,
               isFinal: true,
             }));
-          } else {
-            interimTranscript += transcript;
+          } catch (error: any) {
+            console.error('Whisper error:', error);
+            setState((prev) => ({
+              ...prev,
+              error: `Transcription error: ${error.message}`,
+              isListening: false,
+            }));
           }
+        } else {
+          setState((prev) => ({ ...prev, isListening: false }));
         }
-        
-        interimTranscriptRef.current = interimTranscript;
       };
 
-      recognition.onerror = (event: any) => {
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-        }
+      mediaRecorder.onerror = (event: any) => {
+        if (timerRef.current) clearInterval(timerRef.current);
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+        setState({
+          isListening: false,
+          transcript: '',
+          recordingTime: 0,
+          error: `Recording error: ${event.error}`,
+          isFinal: false,
+          isSupported: true,
+        });
+      };
+
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+    } catch (error: any) {
+      if (error.name === 'NotAllowedError') {
         setState((prev) => ({
           ...prev,
-          error: event.error,
+          error: 'Microphone permission denied. Click 🔒 or 🎤 next to URL and enable microphone',
           isListening: false,
         }));
-      };
-
-      recognition.onend = () => {
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-        }
-        
+      } else if (error.name === 'NotFoundError') {
         setState((prev) => ({
           ...prev,
+          error: 'No microphone found',
           isListening: false,
         }));
-      };
-    } else {
-      setState((prev) => ({ ...prev, isSupported: false }));
-    }
-
-    return () => {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.abort();
-        } catch (e) {
-          // ignore
-        }
+      } else {
+        setState((prev) => ({
+          ...prev,
+          error: `Error: ${error.message}`,
+          isListening: false,
+        }));
       }
-    };
+    }
   }, [language]);
 
-  const startListening = useCallback(() => {
-    if (!recognitionRef.current) return;
-    
-    setState((prev) => ({ ...prev, transcript: '', error: null }));
-    interimTranscriptRef.current = '';
-    
-    // Request microphone permission first
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(() => {
-        // Permission granted, start listening
-        try {
-          recognitionRef.current.start();
-        } catch (err) {
-          console.error('Error starting recognition:', err);
-          setState((prev) => ({
-            ...prev,
-            error: 'Failed to start recording',
-            isListening: false,
-          }));
-        }
-      })
-      .catch((err) => {
-        // Permission denied or error
-        if (err.name === 'NotAllowedError') {
-          setState((prev) => ({
-            ...prev,
-            error: 'Microphone permission denied. Enable in browser settings.',
-            isListening: false,
-          }));
-        } else if (err.name === 'NotFoundError') {
-          setState((prev) => ({
-            ...prev,
-            error: 'No microphone found.',
-            isListening: false,
-          }));
-        } else {
-          setState((prev) => ({
-            ...prev,
-            error: `Microphone error: ${err.message}`,
-            isListening: false,
-          }));
-        }
-      });
-  }, []);
-
   const stopListening = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
     }
-    
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {
-        console.error('Error stopping recognition:', e);
-      }
-    }
-    
-    // Force state update immediately
-    setState((prev) => ({
-      ...prev,
-      isListening: false,
-    }));
+    setState((prev) => ({ ...prev, isListening: false }));
   }, []);
 
   const resetTranscript = useCallback(() => {
@@ -201,8 +164,16 @@ export function useSpeechRecognition(language: string = 'en-US') {
       transcript: '',
       error: null,
       isFinal: false,
+      recordingTime: 0,
     }));
-    interimTranscriptRef.current = '';
+    audioChunksRef.current = [];
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+    };
   }, []);
 
   return {
