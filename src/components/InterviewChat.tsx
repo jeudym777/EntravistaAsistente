@@ -161,6 +161,11 @@ export default function InterviewChat({
           onTranscriptChange={(transcript) => {
             setTranscriptToSend(transcript);
           }}
+          onTranscriptFinalized={() => {
+            if (transcriptToSend.trim()) {
+              handleGenerateAnswer(transcriptToSend, 'technical');
+            }
+          }}
         />
       </div>
 

@@ -1,13 +1,16 @@
+import { useEffect } from 'react';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 
 interface AudioControlsProps {
   language: string;
   onTranscriptChange: (transcript: string) => void;
+  onTranscriptFinalized?: () => void;
 }
 
 export default function AudioControls({
   language,
   onTranscriptChange,
+  onTranscriptFinalized,
 }: AudioControlsProps) {
   const languageCode = language === 'es' ? 'es-ES' : 'en-US';
   const {
@@ -24,6 +27,15 @@ export default function AudioControls({
   if (speechTranscript) {
     onTranscriptChange(speechTranscript);
   }
+
+  useEffect(() => {
+    // When listening stops AND we have a transcript, trigger finalization
+    if (!isListening && speechTranscript && speechTranscript.trim()) {
+      setTimeout(() => {
+        onTranscriptFinalized?.();
+      }, 300);
+    }
+  }, [isListening, speechTranscript, onTranscriptFinalized]);
 
   if (!isSupported) {
     return (
