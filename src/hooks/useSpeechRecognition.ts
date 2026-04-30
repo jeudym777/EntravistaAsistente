@@ -97,21 +97,10 @@ export function useSpeechRecognition(language: string = 'en-US') {
           clearInterval(timerRef.current);
         }
         
-        // If recording time is less than 120 seconds and user didn't manually stop,
-        // restart recording to keep it going
-        if (recordingTimeRef.current < 120) {
-          try {
-            recognitionRef.current.start();
-          } catch (e) {
-            // Recognition is already started, ignore error
-          }
-        } else {
-          // 120 seconds reached, stop listening
-          setState((prev) => ({
-            ...prev,
-            isListening: false,
-          }));
-        }
+        setState((prev) => ({
+          ...prev,
+          isListening: false,
+        }));
       };
     } else {
       setState((prev) => ({ ...prev, isSupported: false }));
@@ -125,14 +114,18 @@ export function useSpeechRecognition(language: string = 'en-US') {
   }, [language]);
 
   const startListening = useCallback(() => {
-    if (recognitionRef.current && !state.isListening) {
+    if (recognitionRef.current) {
       setState((prev) => ({ ...prev, transcript: '', error: null }));
       
       // Request microphone permission first
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(() => {
           // Permission granted, start listening
-          recognitionRef.current.start();
+          try {
+            recognitionRef.current?.start();
+          } catch (err) {
+            console.error('Error starting recognition:', err);
+          }
         })
         .catch((err) => {
           // Permission denied or error
@@ -157,18 +150,21 @@ export function useSpeechRecognition(language: string = 'en-US') {
           }
         });
     }
-  }, [state.isListening]);
+  }, []);
 
   const stopListening = useCallback(() => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    // Set recording time to 120 to signal manual stop (prevent auto-restart)
-    recordingTimeRef.current = 120;
-    if (recognitionRef.current && state.isListening) {
-      recognitionRef.current.stop();
+    
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.error('Error stopping recognition:', e);
+      }
     }
-  }, [state.isListening]);
+  }, []);
 
   const resetTranscript = useCallback(() => {
     setState((prev) => ({

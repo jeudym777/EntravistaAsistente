@@ -31,11 +31,15 @@ export default function AudioControls({
   useEffect(() => {
     // When listening stops AND we have a transcript, trigger finalization
     if (!isListening && speechTranscript && speechTranscript.trim()) {
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         onTranscriptFinalized?.();
+        // Reset transcript after sending
+        resetTranscript();
       }, 300);
+      
+      return () => clearTimeout(timeout);
     }
-  }, [isListening, speechTranscript, onTranscriptFinalized]);
+  }, [isListening, speechTranscript, onTranscriptFinalized, resetTranscript]);
 
   if (!isSupported) {
     return (
