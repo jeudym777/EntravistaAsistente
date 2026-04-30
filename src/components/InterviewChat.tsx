@@ -17,14 +17,15 @@ export default function InterviewChat({
   const [manualQuestion, setManualQuestion] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [transcriptToSend, setTranscriptToSend] = useState('');
+  const [currentTranscript, setCurrentTranscript] = useState('');
+
+  const lastAnswer = messages.filter((m) => m.type === 'answer').pop();
 
   const handleGenerateAnswer = async (
     question: string = '',
     mode: 'default' | 'shorter' | 'technical' | 'natural' = 'default'
   ) => {
-    // Use transcriptToSend first (from audio), then fallback to manual input
-    const questionToUse = question || manualQuestion || transcriptToSend;
+    const questionToUse = question || manualQuestion || currentTranscript;
 
     if (!questionToUse.trim()) {
       setError('Please provide a question first');
@@ -43,15 +44,15 @@ export default function InterviewChat({
 
     try {
       // Add question message if not already there
-      if (!manualQuestion && transcriptToSend) {
+      if (!manualQuestion && currentTranscript) {
         const questionId = 'q-' + Date.now();
         onAddMessage({
           id: questionId,
           type: 'question',
-          content: transcriptToSend,
+          content: currentTranscript,
           timestamp: new Date(),
         });
-        setTranscriptToSend('');
+        setCurrentTranscript('');
       }
 
       const answer = await generateInterviewAnswer({
@@ -79,6 +80,23 @@ export default function InterviewChat({
       console.error('Error generating answer:', err);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    if (lastAnswer) {
+      try {
+        await navigator.clipboard.writeText(lastAnswer.content);
+        alert('Answer copied to clipboard!');
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+  };
+
+  const handleRegenerateMode = (mode: 'shorter' | 'technical' | 'natural') => {
+    if (lastAnswer) {
+      handleGenerateAnswer(lastAnswer.content, mode);
     }
   };
 
@@ -136,33 +154,28 @@ export default function InterviewChat({
         </div>
       )}
 
-      {/* Manual Question Input - Integrated with Audio */}
-      <div className="border-t border-gray-700 p-6 bg-gray-800 space-y-4">
-        <label className="block text-sm font-semibold text-gray-300">
-          Ask a question:
+      {/* Audio Controls */}
+      <div className="border-t border-gray-700 p-6 bg-gray-800">
+        <AudioControls
+          language={state.language}
+          onTranscriptChange={setCurrentTranscript}
+          transcript={currentTranscript}
+        />
+      </div>
+
+      {/* Manual Question Input */}
+      <div className="border-t border-gray-700 p-6 bg-gray-800">
+        <label className="block text-sm font-semibold text-gray-300 mb-2">
+          Or type a question:
         </label>
         <textarea
           value={manualQuestion}
           onChange={(e) => setManualQuestion(e.target.value)}
-          placeholder="Type or use microphone to record a question..."
-          className="w-full h-20 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+          placeholder="Type the interviewer's question here..."
+          className="w-full h-20 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none mb-3"
         />
-        
-        {/* Combined audio controls inside question box */}
-        <AudioControls
-          language={state.language}
-          onTranscriptChange={(transcript) => {
-            setTranscriptToSend(transcript);
-          }}
-          onTranscriptFinalized={() => {
-            if (transcriptToSend.trim()) {
-              handleGenerateAnswer(transcriptToSend, 'technical');
-            }
-          }}
-        />
-        
         <button
-          onClick={() => handleGenerateAnswer(manualQuestion, 'technical')}
+          onClick={() => handleGenerateAnswer(manualQuestion, 'default')}
           disabled={isGenerating}
           className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-lg transition text-lg"
         >
@@ -170,7 +183,41 @@ export default function InterviewChat({
         </button>
       </div>
 
-
+      {/* Answer Modification Buttons */}
+      {lastAnswer && (
+        <div className="border-t border-gray-700 p-3 bg-gray-800 space-y-2">
+          <p className="text-xs text-gray-400 mb-2">Modify last answer:</p>
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => handleRegenerateMode('shorter')}
+              disabled={isGenerating}
+              className="px-2 py-1 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition"
+            >
+              📉 Shorter
+            </button>
+            <button
+              onClick={() => handleRegenerateMode('technical')}
+              disabled={isGenerating}
+              className="px-2 py-1 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition"
+            >
+              ⚙️ Technical
+            </button>
+            <button
+              onClick={() => handleRegenerateMode('natural')}
+              disabled={isGenerating}
+              className="px-2 py-1 bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition"
+            >
+              💬 Natural
+            </button>
+          </div>
+          <button
+            onClick={copyToClipboard}
+            className="w-full px-4 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition"
+          >
+            📋 Copy Answer
+          </button>
+        </div>
+      )}
     </div>
   );
 }

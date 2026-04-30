@@ -97,43 +97,37 @@ export function useSpeechRecognition(language: string = 'en-US') {
           clearInterval(timerRef.current);
         }
         
-        setState((prev) => ({
-          ...prev,
-          isListening: false,
-        }));
+        // If recording time is less than 120 seconds and user didn't manually stop,
+        // restart recording to keep it going
+        if (recordingTimeRef.current < 120) {
+          try {
+            recognitionRef.current.start();
+          } catch (e) {
+            // Recognition is already started, ignore error
+          }
+        } else {
+          // 120 seconds reached, stop listening
+          setState((prev) => ({
+            ...prev,
+            isListening: false,
+          }));
+        }
       };
     } else {
       setState((prev) => ({ ...prev, isSupported: false }));
     }
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
       if (recognitionRef.current) {
-        try {
-          recognitionRef.current.abort();
-        } catch (e) {
-          // Ignore errors on cleanup
-        }
+        recognitionRef.current.abort();
       }
-      recordingTimeRef.current = 0;
     };
   }, [language]);
 
   const startListening = useCallback(() => {
     if (recognitionRef.current && !state.isListening) {
-      try {
-        setState((prev) => ({ ...prev, transcript: '', error: null }));
-        recognitionRef.current.start();
-      } catch (err) {
-        console.error('Error starting recognition:', err);
-        setState((prev) => ({
-          ...prev,
-          error: 'Failed to start recording',
-          isListening: false,
-        }));
-      }
+      setState((prev) => ({ ...prev, transcript: '', error: null }));
+      recognitionRef.current.start();
     }
   }, [state.isListening]);
 
@@ -143,21 +137,10 @@ export function useSpeechRecognition(language: string = 'en-US') {
     }
     // Set recording time to 120 to signal manual stop (prevent auto-restart)
     recordingTimeRef.current = 120;
-    
-    // Update state immediately
-    setState((prev) => ({
-      ...prev,
-      isListening: false,
-    }));
-    
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {
-        // Ignore errors if recognition is not active
-      }
+    if (recognitionRef.current && state.isListening) {
+      recognitionRef.current.stop();
     }
-  }, []);
+  }, [state.isListening]);
 
   const resetTranscript = useCallback(() => {
     setState((prev) => ({

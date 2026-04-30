@@ -1,10 +1,7 @@
 import type { GenerateAnswerParams } from '../types/index';
 
-// Use Worker proxy in production, direct API in development
-const API_URL = import.meta.env.PROD 
-  ? '/api/openai'
-  : 'https://api.openai.com/v1/chat/completions';
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const API_URL = 'https://api.openai.com/v1/chat/completions';
 
 if (!API_KEY) {
   console.warn('⚠️ VITE_OPENAI_API_KEY not found in environment variables');
@@ -79,19 +76,12 @@ ${question}
 Genera la mejor respuesta posible.`;
 
   try {
-    // Build headers based on environment
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    // In production, Worker handles auth. In dev, include Bearer token
-    if (!import.meta.env.PROD && API_KEY) {
-      headers['Authorization'] = `Bearer ${API_KEY}`;
-    }
-
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`,
+      },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
