@@ -25,12 +25,14 @@ export const onRequest: PagesFunction = async (context) => {
       );
     }
 
+    // Copy headers from original request and add Authorization
+    const headers = new Headers(context.request.headers);
+    headers.set('Authorization', `Bearer ${apiKey}`);
+
     // Forward request to OpenAI Whisper API
     const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
+      headers,
       body: context.request.body,
     });
 
