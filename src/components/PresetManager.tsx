@@ -44,7 +44,7 @@ export default function PresetManager({
         candidateProfile: preset.candidateProfile,
         jobDescription: preset.jobDescription,
         extraInstructions: preset.extraInstructions,
-        language: preset.language,
+        language: preset.language as 'en' | 'es',
         wordLimit: preset.wordLimit,
       });
     }

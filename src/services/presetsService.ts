@@ -1,5 +1,3 @@
-import type { InterviewState } from '../types/index';
-
 export interface PresetConfig {
   name: string;
   candidateProfile: string;
@@ -59,8 +57,7 @@ export const presetsService = {
       return 'name,candidateProfile,jobDescription,extraInstructions,language,wordLimit\n';
     }
 
-    const headers = ['name', 'candidateProfile', 'jobDescription', 'extraInstructions', 'language', 'wordLimit'];
-    const csvHeader = headers.join(',') + '\n';
+    const csvHeader = 'name,candidateProfile,jobDescription,extraInstructions,language,wordLimit\n';
     
     const csvRows = presets.map((preset) => {
       return [
