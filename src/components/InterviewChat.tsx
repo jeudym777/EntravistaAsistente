@@ -17,7 +17,6 @@ export default function InterviewChat({
   const [manualQuestion, setManualQuestion] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentTranscript, setCurrentTranscript] = useState('');
   const [transcriptToSend, setTranscriptToSend] = useState('');
 
   const handleGenerateAnswer = async (
@@ -53,7 +52,6 @@ export default function InterviewChat({
           timestamp: new Date(),
         });
         setTranscriptToSend('');
-        setCurrentTranscript('');
       }
 
       const answer = await generateInterviewAnswer({
@@ -154,7 +152,6 @@ export default function InterviewChat({
         <AudioControls
           language={state.language}
           onTranscriptChange={(transcript) => {
-            setCurrentTranscript(transcript);
             setTranscriptToSend(transcript);
           }}
           onTranscriptFinalized={() => {
