@@ -83,23 +83,6 @@ export default function InterviewChat({
     }
   };
 
-  const copyToClipboard = async () => {
-    if (lastAnswer) {
-      try {
-        await navigator.clipboard.writeText(lastAnswer.content);
-        alert('Answer copied to clipboard!');
-      } catch (err) {
-        console.error('Failed to copy:', err);
-      }
-    }
-  };
-
-  const handleRegenerateMode = (mode: 'shorter' | 'technical' | 'natural') => {
-    if (lastAnswer) {
-      handleGenerateAnswer(lastAnswer.content, mode);
-    }
-  };
-
   return (
     <div className="w-1/2 bg-gray-800 flex flex-col h-screen">
       {/* Header */}
@@ -173,13 +156,13 @@ export default function InterviewChat({
           transcript={currentTranscript}
           onTranscriptFinalized={() => {
             if (currentTranscript.trim()) {
-              handleGenerateAnswer(currentTranscript, 'default');
+              handleGenerateAnswer(currentTranscript, 'technical');
             }
           }}
         />
         
         <button
-          onClick={() => handleGenerateAnswer(manualQuestion, 'default')}
+          onClick={() => handleGenerateAnswer(manualQuestion, 'technical')}
           disabled={isGenerating}
           className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-lg transition text-lg"
         >
@@ -187,41 +170,7 @@ export default function InterviewChat({
         </button>
       </div>
 
-      {/* Answer Modification Buttons */}
-      {lastAnswer && (
-        <div className="border-t border-gray-700 p-3 bg-gray-800 space-y-2">
-          <p className="text-xs text-gray-400 mb-2">Modify last answer:</p>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => handleRegenerateMode('shorter')}
-              disabled={isGenerating}
-              className="px-2 py-1 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition"
-            >
-              📉 Shorter
-            </button>
-            <button
-              onClick={() => handleRegenerateMode('technical')}
-              disabled={isGenerating}
-              className="px-2 py-1 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition"
-            >
-              ⚙️ Technical
-            </button>
-            <button
-              onClick={() => handleRegenerateMode('natural')}
-              disabled={isGenerating}
-              className="px-2 py-1 bg-pink-600 hover:bg-pink-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition"
-            >
-              💬 Natural
-            </button>
-          </div>
-          <button
-            onClick={copyToClipboard}
-            className="w-full px-4 py-1 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition"
-          >
-            📋 Copy Answer
-          </button>
-        </div>
-      )}
+
     </div>
   );
 }
