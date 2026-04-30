@@ -4,6 +4,9 @@
 export const onRequest = async (context) => {
   const { request, env } = context;
 
+  console.log('OpenAI proxy called');
+  console.log('Available env keys:', Object.keys(env));
+
   // Handle CORS preflight
   if (request.method === 'OPTIONS') {
     return new Response(null, {
@@ -22,12 +25,18 @@ export const onRequest = async (context) => {
 
   try {
     const body = await request.json();
-    const apiKey = env.VITE_OPENAI_API_KEY;
+    
+    // Try multiple ways to get the API key
+    const apiKey = env.VITE_OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
 
     if (!apiKey) {
-      console.error('API key not configured in environment');
+      console.error('API key not found in environment');
+      console.error('env object:', JSON.stringify(env, null, 2));
       return new Response(
-        JSON.stringify({ error: 'API key not configured' }),
+        JSON.stringify({ 
+          error: 'API key not configured',
+          debug: 'VITE_OPENAI_API_KEY not found'
+        }),
         { 
           status: 500, 
           headers: { 
@@ -37,6 +46,8 @@ export const onRequest = async (context) => {
         }
       );
     }
+
+    console.log('Making request to OpenAI API');
 
     // Forward request to OpenAI API
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -49,6 +60,10 @@ export const onRequest = async (context) => {
     });
 
     const data = await response.json();
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', data);
+    }
 
     return new Response(JSON.stringify(data), {
       status: response.status,
