@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+import { useMediaRecorder } from '../hooks/useMediaRecorder';
 
 interface AudioControlsProps {
   language: string;
@@ -12,25 +12,25 @@ export default function AudioControls({
   onTranscriptChange,
   onTranscriptFinalized,
 }: AudioControlsProps) {
-  const languageCode = language === 'es' ? 'es-ES' : 'en-US';
   const {
-    isListening,
+    isRecording,
+    isTranscribing,
     isSupported,
     error,
-    startListening,
-    stopListening,
+    startRecording,
+    stopRecording,
     resetTranscript,
-    transcript: speechTranscript,
+    transcript,
     recordingTime = 0,
-  } = useSpeechRecognition(languageCode) as any;
+  } = useMediaRecorder(language);
 
-  if (speechTranscript) {
-    onTranscriptChange(speechTranscript);
+  if (transcript) {
+    onTranscriptChange(transcript);
   }
 
   useEffect(() => {
-    // When listening stops AND we have a transcript, trigger finalization
-    if (!isListening && speechTranscript && speechTranscript.trim()) {
+    // When transcription finishes AND we have a transcript, trigger finalization
+    if (!isRecording && !isTranscribing && transcript && transcript.trim()) {
       const timeout = setTimeout(() => {
         onTranscriptFinalized?.();
         // Reset transcript after sending
@@ -39,12 +39,12 @@ export default function AudioControls({
       
       return () => clearTimeout(timeout);
     }
-  }, [isListening, speechTranscript, onTranscriptFinalized, resetTranscript]);
+  }, [isRecording, isTranscribing, transcript, onTranscriptFinalized, resetTranscript]);
 
   if (!isSupported) {
     return (
       <div className="p-4 bg-yellow-900/30 border border-yellow-700 rounded-lg text-yellow-300 text-sm">
-        ⚠️ Speech Recognition not supported in your browser. Use manual input instead.
+        ⚠️ Audio recording not supported in your browser. Use manual input instead.
       </div>
     );
   }
@@ -62,46 +62,59 @@ export default function AudioControls({
       )}
 
       {/* Recording Indicator */}
-      {isListening && (
+      {isRecording && (
         <div className="flex items-center gap-3 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
           <div className="flex gap-1">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
           </div>
-          <span className="text-blue-300 text-sm font-semibold">Listening...</span>
+          <span className="text-blue-300 text-sm font-semibold">Recording...</span>
           <span className="text-blue-300 text-sm font-semibold">⏱️ {recordingTime}s / 120s</span>
         </div>
       )}
 
+      {/* Transcribing Indicator */}
+      {isTranscribing && (
+        <div className="flex items-center gap-3 p-3 bg-purple-900/30 border border-purple-700 rounded-lg">
+          <div className="flex gap-1">
+            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          </div>
+          <span className="text-purple-300 text-sm font-semibold">Transcribing with Whisper...</span>
+        </div>
+      )}
+
       {/* Display captured transcript */}
-      {speechTranscript && !isListening && (
+      {transcript && !isRecording && !isTranscribing && (
         <div className="p-4 bg-green-900/30 border border-green-600 rounded-lg space-y-2">
           <p className="text-green-300 text-sm font-bold">📝 Captured Audio:</p>
           <div className="bg-black/50 p-3 rounded text-white text-sm leading-relaxed max-h-24 overflow-y-auto">
-            {speechTranscript}
+            {transcript}
           </div>
         </div>
       )}
 
       {/* Controls */}
       <div className="flex gap-2">
-        {!isListening ? (
+        {!isRecording && !isTranscribing ? (
           <button
-            onClick={startListening}
+            onClick={startRecording}
             className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition text-lg"
           >
-            🎤 Start Listening
+            🎤 Start Recording
           </button>
         ) : (
           <button
-            onClick={stopListening}
-            className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition text-lg"
+            onClick={stopRecording}
+            disabled={isTranscribing}
+            className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white font-bold rounded-lg transition text-lg"
           >
-            ⏹️ Stop Listening
+            ⏹️ Stop Recording
           </button>
         )}
-        {speechTranscript && (
+        {transcript && !isRecording && !isTranscribing && (
           <button
             onClick={resetTranscript}
             className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition"
