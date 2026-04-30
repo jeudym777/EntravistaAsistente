@@ -154,8 +154,19 @@ export default function InterviewChat({
         </div>
       )}
 
-      {/* Audio Controls */}
-      <div className="border-t border-gray-700 p-6 bg-gray-800">
+      {/* Manual Question Input - Integrated with Audio */}
+      <div className="border-t border-gray-700 p-6 bg-gray-800 space-y-4">
+        <label className="block text-sm font-semibold text-gray-300">
+          Ask a question:
+        </label>
+        <textarea
+          value={manualQuestion}
+          onChange={(e) => setManualQuestion(e.target.value)}
+          placeholder="Type or use microphone to record a question..."
+          className="w-full h-20 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+        />
+        
+        {/* Combined audio controls inside question box */}
         <AudioControls
           language={state.language}
           onTranscriptChange={setCurrentTranscript}
@@ -166,19 +177,7 @@ export default function InterviewChat({
             }
           }}
         />
-      </div>
-
-      {/* Manual Question Input */}
-      <div className="border-t border-gray-700 p-6 bg-gray-800">
-        <label className="block text-sm font-semibold text-gray-300 mb-2">
-          Or type a question:
-        </label>
-        <textarea
-          value={manualQuestion}
-          onChange={(e) => setManualQuestion(e.target.value)}
-          placeholder="Type the interviewer's question here..."
-          className="w-full h-20 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none mb-3"
-        />
+        
         <button
           onClick={() => handleGenerateAnswer(manualQuestion, 'default')}
           disabled={isGenerating}
