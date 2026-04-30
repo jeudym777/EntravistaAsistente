@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { InterviewState, InterviewMessage } from '../types/index';
 import { generateInterviewAnswer } from '../services/openaiService';
 import AudioControls from './AudioControls';

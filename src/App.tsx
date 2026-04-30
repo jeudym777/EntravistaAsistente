@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { InterviewState, InterviewMessage } from './types/index';
 import InterviewSetup from './components/InterviewSetup';
 import InterviewChat from './components/InterviewChat';

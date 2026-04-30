@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useCamera } from '../hooks/useCamera';
 
 export default function CameraPanel() {
