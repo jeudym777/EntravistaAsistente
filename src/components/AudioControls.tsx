@@ -74,6 +74,16 @@ export default function AudioControls({
         </div>
       )}
 
+      {/* Display captured transcript */}
+      {speechTranscript && !isListening && (
+        <div className="p-4 bg-green-900/30 border border-green-600 rounded-lg space-y-2">
+          <p className="text-green-300 text-sm font-bold">📝 Captured Audio:</p>
+          <div className="bg-black/50 p-3 rounded text-white text-sm leading-relaxed max-h-24 overflow-y-auto">
+            {speechTranscript}
+          </div>
+        </div>
+      )}
+
       {/* Controls */}
       <div className="flex gap-2">
         {!isListening ? (

@@ -25,6 +25,7 @@ export function useSpeechRecognition(language: string = 'en-US') {
   const recognitionRef = useRef<any>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const recordingTimeRef = useRef<number>(0);
+  const interimTranscriptRef = useRef<string>('');
 
   useEffect(() => {
     const SpeechRecognition =
@@ -41,6 +42,7 @@ export function useSpeechRecognition(language: string = 'en-US') {
 
       recognition.onstart = () => {
         recordingTimeRef.current = 0;
+        interimTranscriptRef.current = '';
         setState((prev) => ({
           ...prev,
           isListening: true,
@@ -61,24 +63,35 @@ export function useSpeechRecognition(language: string = 'en-US') {
           // Stop recording after 120 seconds
           if (recordingTimeRef.current >= 120) {
             if (recognitionRef.current) {
-              recognitionRef.current.stop();
+              try {
+                recognitionRef.current.stop();
+              } catch (e) {
+                // ignore
+              }
             }
           }
         }, 1000);
       };
 
       recognition.onresult = (event: any) => {
-        // Only capture final results to avoid showing intermediate transcriptions
+        let interimTranscript = '';
+        
+        // Capture both interim and final results
         for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          
           if (event.results[i].isFinal) {
-            const transcript = event.results[i][0].transcript;
             setState((prev) => ({
               ...prev,
               transcript: (prev.transcript + ' ' + transcript).trim(),
               isFinal: true,
             }));
+          } else {
+            interimTranscript += transcript;
           }
         }
+        
+        interimTranscriptRef.current = interimTranscript;
       };
 
       recognition.onerror = (event: any) => {
@@ -108,48 +121,58 @@ export function useSpeechRecognition(language: string = 'en-US') {
 
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.abort();
+        try {
+          recognitionRef.current.abort();
+        } catch (e) {
+          // ignore
+        }
       }
     };
   }, [language]);
 
   const startListening = useCallback(() => {
-    if (recognitionRef.current) {
-      setState((prev) => ({ ...prev, transcript: '', error: null }));
-      
-      // Request microphone permission first
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(() => {
-          // Permission granted, start listening
-          try {
-            recognitionRef.current?.start();
-          } catch (err) {
-            console.error('Error starting recognition:', err);
-          }
-        })
-        .catch((err) => {
-          // Permission denied or error
-          if (err.name === 'NotAllowedError') {
-            setState((prev) => ({
-              ...prev,
-              error: 'Microphone permission denied. Please enable microphone access in browser settings.',
-              isListening: false,
-            }));
-          } else if (err.name === 'NotFoundError') {
-            setState((prev) => ({
-              ...prev,
-              error: 'No microphone found. Please connect a microphone and try again.',
-              isListening: false,
-            }));
-          } else {
-            setState((prev) => ({
-              ...prev,
-              error: `Microphone error: ${err.message}`,
-              isListening: false,
-            }));
-          }
-        });
-    }
+    if (!recognitionRef.current) return;
+    
+    setState((prev) => ({ ...prev, transcript: '', error: null }));
+    interimTranscriptRef.current = '';
+    
+    // Request microphone permission first
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(() => {
+        // Permission granted, start listening
+        try {
+          recognitionRef.current.start();
+        } catch (err) {
+          console.error('Error starting recognition:', err);
+          setState((prev) => ({
+            ...prev,
+            error: 'Failed to start recording',
+            isListening: false,
+          }));
+        }
+      })
+      .catch((err) => {
+        // Permission denied or error
+        if (err.name === 'NotAllowedError') {
+          setState((prev) => ({
+            ...prev,
+            error: 'Microphone permission denied. Enable in browser settings.',
+            isListening: false,
+          }));
+        } else if (err.name === 'NotFoundError') {
+          setState((prev) => ({
+            ...prev,
+            error: 'No microphone found.',
+            isListening: false,
+          }));
+        } else {
+          setState((prev) => ({
+            ...prev,
+            error: `Microphone error: ${err.message}`,
+            isListening: false,
+          }));
+        }
+      });
   }, []);
 
   const stopListening = useCallback(() => {
@@ -164,6 +187,12 @@ export function useSpeechRecognition(language: string = 'en-US') {
         console.error('Error stopping recognition:', e);
       }
     }
+    
+    // Force state update immediately
+    setState((prev) => ({
+      ...prev,
+      isListening: false,
+    }));
   }, []);
 
   const resetTranscript = useCallback(() => {
@@ -173,6 +202,7 @@ export function useSpeechRecognition(language: string = 'en-US') {
       error: null,
       isFinal: false,
     }));
+    interimTranscriptRef.current = '';
   }, []);
 
   return {
