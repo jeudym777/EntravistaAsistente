@@ -4,13 +4,11 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 interface AudioControlsProps {
   language: string;
   onTranscriptChange: (transcript: string) => void;
-  transcript: string;
 }
 
 export default function AudioControls({
   language,
   onTranscriptChange,
-  transcript,
 }: AudioControlsProps) {
   const languageCode = language === 'es' ? 'es-ES' : 'en-US';
   const {
@@ -40,10 +38,13 @@ export default function AudioControls({
 
   return (
     <div className="space-y-4">
-      {/* Error Display */}
+      {/* Permission/Error Display */}
       {error && (
-        <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm">
-          ❌ Error: {error}
+        <div className="p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm space-y-2">
+          <p className="font-semibold">🔐 {error}</p>
+          <p className="text-xs text-red-300">
+            💡 <strong>Solución:</strong> Click en el 🔒 o 🎤 junto a la URL y permite acceso al micrófono, luego intenta nuevamente.
+          </p>
         </div>
       )}
 

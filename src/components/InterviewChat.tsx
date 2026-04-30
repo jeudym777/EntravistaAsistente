@@ -158,8 +158,9 @@ export default function InterviewChat({
       <div className="border-t border-gray-700 p-6 bg-gray-800">
         <AudioControls
           language={state.language}
-          onTranscriptChange={setCurrentTranscript}
-          transcript={currentTranscript}
+          onTranscriptChange={(transcript) => {
+            setTranscriptToSend(transcript);
+          }}
         />
       </div>
 

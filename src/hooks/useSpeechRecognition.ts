@@ -127,7 +127,35 @@ export function useSpeechRecognition(language: string = 'en-US') {
   const startListening = useCallback(() => {
     if (recognitionRef.current && !state.isListening) {
       setState((prev) => ({ ...prev, transcript: '', error: null }));
-      recognitionRef.current.start();
+      
+      // Request microphone permission first
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(() => {
+          // Permission granted, start listening
+          recognitionRef.current.start();
+        })
+        .catch((err) => {
+          // Permission denied or error
+          if (err.name === 'NotAllowedError') {
+            setState((prev) => ({
+              ...prev,
+              error: 'Microphone permission denied. Please enable microphone access in browser settings.',
+              isListening: false,
+            }));
+          } else if (err.name === 'NotFoundError') {
+            setState((prev) => ({
+              ...prev,
+              error: 'No microphone found. Please connect a microphone and try again.',
+              isListening: false,
+            }));
+          } else {
+            setState((prev) => ({
+              ...prev,
+              error: `Microphone error: ${err.message}`,
+              isListening: false,
+            }));
+          }
+        });
     }
   }, [state.isListening]);
 
