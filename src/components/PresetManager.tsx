@@ -135,26 +135,12 @@ export default function PresetManager({
     reader.onload = (e) => {
       try {
         const csv = e.target?.result as string;
-        const lines = csv.split('\n').filter((line) => line.trim());
-        
-        if (lines.length < 2) {
-          alert('Invalid CSV format');
+        const importedPresets = parseCSV(csv);
+
+        if (importedPresets.length === 0) {
+          alert('No valid presets found in CSV');
           return;
         }
-
-        // Skip header
-        const importedPresets: Preset[] = lines.slice(1).map((line) => {
-          const values = parseCSVLine(line);
-          const language = (values[1] || 'en') === 'es' ? 'es' : 'en';
-          return {
-            presetName: values[0] || 'Unnamed',
-            language,
-            wordLimit: parseInt(values[2] || '120', 10),
-            candidateProfile: values[3] || '',
-            jobDescription: values[4] || '',
-            extraInstructions: values[5] || '',
-          };
-        });
 
         // Merge with existing, replacing duplicates by name
         const merged = presets.filter(
@@ -275,7 +261,82 @@ export default function PresetManager({
   );
 }
 
-// Helper to parse CSV lines properly (handles quoted values)
+// Robust CSV parser that handles multiline fields and quoted values
+function parseCSV(csvText: string): Preset[] {
+  const lines = csvText.split('\n');
+  
+  if (lines.length < 2) return [];
+
+  // Skip header
+  const dataLines = lines.slice(1);
+  const presets: Preset[] = [];
+  let i = 0;
+
+  while (i < dataLines.length) {
+    const row = parseCSVRow(dataLines, i);
+    if (row.values && row.values.length >= 6) {
+      const language = (row.values[1] || 'en').toLowerCase() === 'es' ? 'es' : 'en';
+      const preset: Preset = {
+        presetName: row.values[0]?.trim() || 'Unnamed',
+        language,
+        wordLimit: parseInt(row.values[2] || '120', 10) || 120,
+        candidateProfile: row.values[3]?.trim() || '',
+        jobDescription: row.values[4]?.trim() || '',
+        extraInstructions: row.values[5]?.trim() || '',
+      };
+      
+      // Only add if has a name
+      if (preset.presetName && preset.presetName !== 'Unnamed') {
+        presets.push(preset);
+      }
+    }
+    i = row.nextLine;
+  }
+
+  return presets;
+}
+
+// Parse a single CSV row, handling multiline quoted fields
+function parseCSVRow(
+  lines: string[],
+  startLine: number
+): { values: string[]; nextLine: number } {
+  let row = '';
+  let line = startLine;
+  let inQuotes = false;
+
+  while (line < lines.length) {
+    const currentLine = lines[line];
+    
+    if (!currentLine) {
+      line++;
+      continue;
+    }
+
+    row += (row ? '\n' : '') + currentLine;
+
+    // Check if we have unclosed quotes
+    for (let i = 0; i < currentLine.length; i++) {
+      if (currentLine[i] === '"' && (i === 0 || currentLine[i - 1] !== '\\')) {
+        if (inQuotes && currentLine[i + 1] === '"') {
+          i++; // Skip escaped quote
+        } else {
+          inQuotes = !inQuotes;
+        }
+      }
+    }
+
+    line++;
+
+    // If quotes are closed, we have a complete row
+    if (!inQuotes) break;
+  }
+
+  const values = parseCSVLine(row);
+  return { values, nextLine: line };
+}
+
+// Parse a CSV line into fields
 function parseCSVLine(line: string): string[] {
   const result: string[] = [];
   let current = '';
@@ -293,13 +354,21 @@ function parseCSVLine(line: string): string[] {
         inQuotes = !inQuotes;
       }
     } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
+      result.push(stripQuotes(current.trim()));
       current = '';
     } else {
       current += char;
     }
   }
 
-  result.push(current.trim());
+  result.push(stripQuotes(current.trim()));
   return result;
+}
+
+// Remove surrounding quotes from a string
+function stripQuotes(str: string): string {
+  if (str.startsWith('"') && str.endsWith('"')) {
+    return str.slice(1, -1).replace(/""/g, '"');
+  }
+  return str;
 }
