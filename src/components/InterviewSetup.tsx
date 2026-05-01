@@ -108,20 +108,20 @@ export default function InterviewSetup({
     }
   }, []);
   return (
-    <div className="w-1/2 bg-black border-l border-gray-700 p-6 overflow-y-auto">
-      <h2 className="text-2xl font-bold text-white mb-6">Interview Setup</h2>
+    <div className="w-1/2 bg-black border-l border-gray-700 p-4 overflow-y-auto">
+      <h2 className="text-lg font-semibold text-white mb-4">Setup</h2>
 
       {/* Language Selector */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-300 mb-2">
-          Language / Idioma
+      <div className="mb-3">
+        <label className="block text-xs font-semibold text-gray-400 mb-1">
+          Language
         </label>
         <select
           value={state.language}
           onChange={(e) =>
             onStateChange({ language: e.target.value as 'en' | 'es' })
           }
-          className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+          className="w-full px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white text-sm focus:outline-none focus:border-gray-500"
         >
           <option value="en">English</option>
           <option value="es">Español</option>
@@ -129,8 +129,8 @@ export default function InterviewSetup({
       </div>
 
       {/* Word Limit */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-300 mb-2">
+      <div className="mb-3">
+        <label className="block text-xs font-semibold text-gray-400 mb-1">
           Word Limit
         </label>
         <input
@@ -139,59 +139,60 @@ export default function InterviewSetup({
           max="500"
           value={state.wordLimit}
           onChange={(e) => onStateChange({ wordLimit: parseInt(e.target.value) })}
-          className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+          className="w-full px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white text-sm focus:outline-none focus:border-gray-500"
         />
-        <p className="text-xs text-gray-400 mt-1">Default: 120 words</p>
       </div>
 
       {/* Preset Manager */}
-      <div className="mb-6">
+      <div className="mb-4 border-t border-gray-700 pt-3">
         <PresetManager state={state} onStateChange={onStateChange} />
       </div>
 
       {/* Candidate Profile */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-300 mb-2">
-          Candidate Profile / Perfil del Candidato
+      <div className="mb-3">
+        <label className="block text-xs font-semibold text-gray-400 mb-1">
+          Candidate Profile
         </label>
         <textarea
           value={state.candidateProfile}
           onChange={(e) => onStateChange({ candidateProfile: e.target.value })}
-          placeholder="Paste your CV, experience, skills, and relevant information here..."
-          className="w-full h-32 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+          placeholder="Paste your CV..."
+          className="w-full h-20 px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-gray-500 resize-none"
         />
       </div>
 
       {/* Job Description */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-300 mb-2">
-          Job Description / Descripción del Puesto
+      <div className="mb-3">
+        <label className="block text-xs font-semibold text-gray-400 mb-1">
+          Job Description
         </label>
         <textarea
           value={state.jobDescription}
           onChange={(e) => onStateChange({ jobDescription: e.target.value })}
-          placeholder="Paste the job description, requirements, and responsibilities..."
-          className="w-full h-32 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+          placeholder="Paste the job description..."
+          className="w-full h-20 px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-gray-500 resize-none"
         />
       </div>
 
       {/* Extra Instructions */}
-      <div className="mb-6">
-        <label className="block text-sm font-semibold text-gray-300 mb-2">
-          Extra Instructions / Instrucciones Adicionales
+      <div className="mb-4">
+        <label className="block text-xs font-semibold text-gray-400 mb-1">
+          Extra Instructions
         </label>
         <textarea
           value={state.extraInstructions}
           onChange={(e) =>
             onStateChange({ extraInstructions: e.target.value })
           }
-          placeholder="Any additional instructions or context for the AI assistant..."
-          className="w-full h-24 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+          placeholder="Additional context or instructions..."
+          className="w-full h-16 px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-gray-500 resize-none"
         />
       </div>
 
       {/* Camera Panel */}
-      <CameraPanel />
+      <div className="border-t border-gray-700 pt-3">
+        <CameraPanel />
+      </div>
     </div>
   );
 }

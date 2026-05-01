@@ -50,76 +50,74 @@ export default function AudioControls({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Permission/Error Display */}
       {error && (
-        <div className="p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm space-y-2">
-          <p className="font-semibold">🔐 {error}</p>
-          <p className="text-xs text-red-300">
-            💡 <strong>Solución:</strong> Click en el 🔒 o 🎤 junto a la URL y permite acceso al micrófono, luego intenta nuevamente.
+        <div className="p-3 bg-red-900/20 border border-red-700/50 rounded text-red-400 text-xs">
+          <p className="font-medium">🔐 {error}</p>
+          <p className="text-red-400/70 mt-1">
+            💡 Click 🔒 next to URL and enable microphone
           </p>
         </div>
       )}
 
-      {/* Recording Indicator */}
+      {/* Recording Status Compact */}
       {isRecording && (
-        <div className="flex items-center gap-3 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
+        <div className="flex items-center gap-2 p-2 bg-blue-900/20 border border-blue-700/50 rounded text-sm">
           <div className="flex gap-1">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
+            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
           </div>
-          <span className="text-blue-300 text-sm font-semibold">Recording...</span>
-          <span className="text-blue-300 text-sm font-semibold">⏱️ {recordingTime}s / 120s</span>
+          <span className="text-blue-400 text-xs font-medium">Recording • ⏱️ {recordingTime}s</span>
         </div>
       )}
 
-      {/* Transcribing Indicator */}
+      {/* Transcribing Status */}
       {isTranscribing && (
-        <div className="flex items-center gap-3 p-3 bg-purple-900/30 border border-purple-700 rounded-lg">
+        <div className="flex items-center gap-2 p-2 bg-purple-900/20 border border-purple-700/50 rounded text-sm">
           <div className="flex gap-1">
-            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse"></div>
+            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
           </div>
-          <span className="text-purple-300 text-sm font-semibold">Transcribing with Whisper...</span>
+          <span className="text-purple-400 text-xs font-medium">Transcribing...</span>
         </div>
       )}
 
-      {/* Display captured transcript */}
+      {/* Transcript Preview */}
       {transcript && !isRecording && !isTranscribing && (
-        <div className="p-4 bg-green-900/30 border border-green-600 rounded-lg space-y-2">
-          <p className="text-green-300 text-sm font-bold">📝 Captured Audio:</p>
-          <div className="bg-black/50 p-3 rounded text-white text-sm leading-relaxed max-h-24 overflow-y-auto">
-            {transcript}
-          </div>
+        <div className="p-3 bg-green-900/20 border border-green-700/50 rounded text-sm">
+          <p className="text-green-400 text-xs font-semibold mb-1">✓ Captured</p>
+          <p className="text-gray-300 text-xs leading-relaxed">{transcript}</p>
         </div>
       )}
 
-      {/* Controls */}
-      <div className="flex gap-2">
+      {/* Controls - Compact */}
+      <div className="flex gap-2 items-center">
         {!isRecording && !isTranscribing ? (
           <button
             onClick={startRecording}
-            className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition text-lg"
+            className="flex-1 px-3 py-2 bg-green-600/20 border border-green-600/50 hover:bg-green-600/30 text-green-400 rounded text-sm font-medium transition"
           >
-            🎤 Start Recording
+            🎤 Record
           </button>
         ) : (
           <button
             onClick={stopRecording}
             disabled={isTranscribing}
-            className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white font-bold rounded-lg transition text-lg"
+            className="flex-1 px-3 py-2 bg-red-600/20 border border-red-600/50 hover:bg-red-600/30 disabled:opacity-50 text-red-400 rounded text-sm font-medium transition"
           >
-            ⏹️ Stop Recording
+            ⏹️ Stop
           </button>
         )}
         {transcript && !isRecording && !isTranscribing && (
           <button
             onClick={resetTranscript}
-            className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition"
+            className="px-2 py-2 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded transition"
+            title="Clear"
           >
-            🔄 Clear
+            ✕
           </button>
         )}
       </div>

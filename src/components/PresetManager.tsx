@@ -159,104 +159,93 @@ export default function PresetManager({
   };
 
   return (
-    <div className="space-y-4 bg-gray-900/50 p-4 rounded-lg border border-gray-700">
-      <h3 className="text-lg font-bold text-white">📋 Presets</h3>
-
-      {/* Save New Preset */}
-      <div className="space-y-3">
-        {showForm ? (
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={presetName}
-              onChange={(e) => setPresetName(e.target.value)}
-              placeholder="Preset name (e.g., Senior Backend Engineer)"
-              className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-blue-500"
-              onKeyPress={(e) => e.key === 'Enter' && handleSavePreset()}
-            />
-            <button
-              onClick={handleSavePreset}
-              className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded transition"
-            >
-              ✅ Save
-            </button>
-            <button
-              onClick={() => {
-                setShowForm(false);
-                setPresetName('');
-              }}
-              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold rounded transition"
-            >
-              ❌ Cancel
-            </button>
-          </div>
-        ) : (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-semibold text-gray-400">📋 Presets</p>
+        <div className="flex gap-1">
           <button
-            onClick={() => setShowForm(true)}
-            className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded transition"
+            onClick={handleExportCSV}
+            disabled={presets.length === 0}
+            className="px-1.5 py-0.5 bg-green-600/20 border border-green-600/50 hover:bg-green-600/30 disabled:opacity-50 text-green-400 rounded text-xs transition"
+            title="Export CSV"
           >
-            💾 Save Current Config as Preset
+            📥
           </button>
-        )}
+          <label className="cursor-pointer">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleImportCSV}
+              className="hidden"
+            />
+            <span className="px-1.5 py-0.5 bg-purple-600/20 border border-purple-600/50 hover:bg-purple-600/30 text-purple-400 rounded text-xs transition inline-block">
+              📤
+            </span>
+          </label>
+        </div>
       </div>
 
-      {/* Presets List */}
-      {presets.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-gray-300 text-xs font-semibold">Saved Presets:</p>
-          <div className="space-y-2 max-h-40 overflow-y-auto">
-            {presets.map((preset) => (
-              <div
-                key={preset.presetName}
-                className="flex gap-2 p-2 bg-gray-800/50 border border-gray-600 rounded items-center justify-between text-sm"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-semibold truncate">{preset.presetName}</p>
-                  <p className="text-gray-400 text-xs">
-                    {preset.language === 'es' ? '🇪🇸 Spanish' : '🇺🇸 English'} • {preset.wordLimit} words
-                  </p>
-                </div>
-                <div className="flex gap-1 shrink-0">
-                  <button
-                    onClick={() => handleLoadPreset(preset)}
-                    className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded transition"
-                  >
-                    📂 Load
-                  </button>
-                  <button
-                    onClick={() => handleDeletePreset(preset.presetName)}
-                    className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded transition"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Save Preset Form */}
+      {showForm ? (
+        <div className="flex gap-1">
+          <input
+            type="text"
+            value={presetName}
+            onChange={(e) => setPresetName(e.target.value)}
+            placeholder="Name..."
+            className="flex-1 px-2 py-1 bg-gray-700/50 border border-gray-600/50 rounded text-white text-xs focus:outline-none focus:border-gray-500"
+            onKeyPress={(e) => e.key === 'Enter' && handleSavePreset()}
+          />
+          <button
+            onClick={handleSavePreset}
+            className="px-2 py-1 bg-green-600/20 border border-green-600/50 hover:bg-green-600/30 text-green-400 rounded text-xs transition"
+          >
+            ✓
+          </button>
+          <button
+            onClick={() => {
+              setShowForm(false);
+              setPresetName('');
+            }}
+            className="px-2 py-1 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded text-xs transition"
+          >
+            ✕
+          </button>
         </div>
+      ) : (
+        <button
+          onClick={() => setShowForm(true)}
+          className="w-full px-2 py-1 bg-blue-600/20 border border-blue-600/50 hover:bg-blue-600/30 text-blue-400 rounded text-xs font-medium transition"
+        >
+          💾 Save
+        </button>
       )}
 
-      {/* Export/Import */}
-      <div className="flex gap-2 pt-2 border-t border-gray-700">
-        <button
-          onClick={handleExportCSV}
-          disabled={presets.length === 0}
-          className="flex-1 px-3 py-2 bg-green-700 hover:bg-green-800 disabled:bg-gray-700 text-white text-sm font-semibold rounded transition"
-        >
-          📥 Export CSV
-        </button>
-        <label className="flex-1 cursor-pointer">
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleImportCSV}
-            className="hidden"
-          />
-          <span className="block px-3 py-2 bg-purple-700 hover:bg-purple-800 text-white text-sm font-semibold rounded transition text-center">
-            📤 Import CSV
-          </span>
-        </label>
-      </div>
+      {/* Presets List - Compact */}
+      {presets.length > 0 && (
+        <div className="space-y-1 max-h-24 overflow-y-auto">
+          {presets.map((preset) => (
+            <div
+              key={preset.presetName}
+              className="flex items-center gap-1 p-1 bg-gray-700/20 border border-gray-600/30 rounded text-xs group hover:bg-gray-700/30 transition"
+            >
+              <button
+                onClick={() => handleLoadPreset(preset)}
+                className="flex-1 text-left px-1.5 py-0.5 text-gray-300 hover:text-blue-400 truncate"
+                title={preset.presetName}
+              >
+                {preset.presetName}
+              </button>
+              <button
+                onClick={() => handleDeletePreset(preset.presetName)}
+                className="px-1 py-0.5 text-gray-500 hover:text-red-400 transition opacity-0 group-hover:opacity-100"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
