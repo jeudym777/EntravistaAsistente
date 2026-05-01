@@ -1,7 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
-import type { CameraContextType } from '../types/index';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
-export function useCamera(): Omit<CameraContextType, 'snapshot'> & { snapshot: string | null; snapshotTime?: number } {
+export interface CameraDevice {
+  deviceId: string;
+  label: string;
+}
+
+export function useCamera() {
   const [isSupported] = useState(
     () => !!(navigator.mediaDevices?.getUserMedia)
   );
@@ -9,15 +13,58 @@ export function useCamera(): Omit<CameraContextType, 'snapshot'> & { snapshot: s
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cameras, setCameras] = useState<CameraDevice[]>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // List available cameras
+  const listCameras = useCallback(async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices
+        .filter((device) => device.kind === 'videoinput')
+        .map((device) => ({
+          deviceId: device.deviceId,
+          label: device.label || `Camera ${device.deviceId.slice(0, 5)}`,
+        }));
+      
+      setCameras(videoDevices);
+      if (videoDevices.length > 0 && !selectedCameraId) {
+        setSelectedCameraId(videoDevices[0].deviceId);
+      }
+    } catch (err) {
+      console.error('Failed to enumerate devices:', err);
+    }
+  }, [selectedCameraId]);
+
+  // List cameras on mount
+  useEffect(() => {
+    listCameras();
+    
+    // Listen for device changes (camera connected/disconnected)
+    const handleDeviceChange = () => {
+      listCameras();
+    };
+    
+    navigator.mediaDevices?.addEventListener('devicechange', handleDeviceChange);
+    return () => {
+      navigator.mediaDevices?.removeEventListener('devicechange', handleDeviceChange);
+    };
+  }, [listCameras]);
 
   const enableCamera = useCallback(async () => {
     try {
       setError(null);
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+      const constraints: MediaStreamConstraints = {
+        video: {
+          deviceId: selectedCameraId ? { exact: selectedCameraId } : undefined,
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: false,
-      });
+      };
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(mediaStream);
       setIsEnabled(true);
 
@@ -30,7 +77,7 @@ export function useCamera(): Omit<CameraContextType, 'snapshot'> & { snapshot: s
       setError(errorMsg);
       setIsEnabled(false);
     }
-  }, []);
+  }, [selectedCameraId]);
 
   const disableCamera = useCallback(() => {
     if (stream) {
@@ -41,7 +88,7 @@ export function useCamera(): Omit<CameraContextType, 'snapshot'> & { snapshot: s
     }
   }, [stream]);
 
-  const captureSnapshot = useCallback(() => {
+  const captureSnapshot = useCallback((): string | null => {
     if (videoRef.current) {
       const canvas = document.createElement('canvas');
       canvas.width = videoRef.current.videoWidth;
@@ -51,8 +98,19 @@ export function useCamera(): Omit<CameraContextType, 'snapshot'> & { snapshot: s
         ctx.drawImage(videoRef.current, 0, 0);
         const snapshotUrl = canvas.toDataURL('image/jpeg');
         setSnapshot(snapshotUrl);
+        return snapshotUrl;
       }
     }
+    return null;
+  }, []);
+
+  const downloadSnapshot = useCallback((snapshotUrl: string) => {
+    const link = document.createElement('a');
+    link.href = snapshotUrl;
+    link.download = `snapshot-${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }, []);
 
   return {
@@ -60,9 +118,13 @@ export function useCamera(): Omit<CameraContextType, 'snapshot'> & { snapshot: s
     isEnabled,
     stream,
     snapshot,
+    cameras,
+    selectedCameraId,
     enableCamera,
     disableCamera,
     captureSnapshot,
+    downloadSnapshot,
+    setSelectedCameraId,
     error,
   };
 }

@@ -2,8 +2,20 @@ import { useEffect, useRef } from 'react';
 import { useCamera } from '../hooks/useCamera';
 
 export default function CameraPanel() {
-  const { isSupported, isEnabled, stream, snapshot, enableCamera, disableCamera, captureSnapshot, error } =
-    useCamera();
+  const {
+    isSupported,
+    isEnabled,
+    stream,
+    snapshot,
+    cameras,
+    selectedCameraId,
+    enableCamera,
+    disableCamera,
+    captureSnapshot,
+    downloadSnapshot,
+    setSelectedCameraId,
+    error,
+  } = useCamera();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -11,6 +23,16 @@ export default function CameraPanel() {
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
+
+  const handleCapture = () => {
+    const snapshotUrl = captureSnapshot();
+    if (snapshotUrl) {
+      // Auto-download after a brief delay to ensure image is set
+      setTimeout(() => {
+        downloadSnapshot(snapshotUrl);
+      }, 100);
+    }
+  };
 
   if (!isSupported) {
     return (
@@ -27,6 +49,26 @@ export default function CameraPanel() {
       <h3 className="text-lg font-semibold text-white mb-4">
         Optional: Camera / Cámara
       </h3>
+
+      {/* Camera Selector */}
+      {cameras.length > 0 && !isEnabled && (
+        <div className="mb-4">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+            Select Camera / Seleccionar Cámara
+          </label>
+          <select
+            value={selectedCameraId}
+            onChange={(e) => setSelectedCameraId(e.target.value)}
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm"
+          >
+            {cameras.map((camera) => (
+              <option key={camera.deviceId} value={camera.deviceId}>
+                {camera.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Video Preview */}
       <div className="mb-4 rounded-lg overflow-hidden bg-gray-800 border border-gray-700">
@@ -70,7 +112,7 @@ export default function CameraPanel() {
         ) : (
           <>
             <button
-              onClick={captureSnapshot}
+              onClick={handleCapture}
               className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
             >
               📸 Capture Snapshot
