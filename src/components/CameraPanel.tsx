@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useCamera } from '../hooks/useCamera';
 
 export default function CameraPanel() {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const {
     isSupported,
     isEnabled,
@@ -15,8 +16,7 @@ export default function CameraPanel() {
     downloadSnapshot,
     setSelectedCameraId,
     error,
-  } = useCamera();
-  const videoRef = useRef<HTMLVideoElement>(null);
+  } = useCamera(videoRef);
 
   useEffect(() => {
     if (videoRef.current && stream) {
@@ -25,12 +25,16 @@ export default function CameraPanel() {
   }, [stream]);
 
   const handleCapture = () => {
-    const snapshotUrl = captureSnapshot();
-    if (snapshotUrl) {
-      // Auto-download after a brief delay to ensure image is set
-      setTimeout(() => {
+    try {
+      const snapshotUrl = captureSnapshot();
+      if (snapshotUrl) {
         downloadSnapshot(snapshotUrl);
-      }, 100);
+      } else {
+        alert('Failed to capture snapshot. Make sure camera is enabled and has video.');
+      }
+    } catch (err) {
+      console.error('Capture error:', err);
+      alert('Error capturing snapshot');
     }
   };
 

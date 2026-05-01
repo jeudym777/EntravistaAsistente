@@ -5,7 +5,10 @@ export interface CameraDevice {
   label: string;
 }
 
-export function useCamera() {
+export function useCamera(externalVideoRef?: React.MutableRefObject<HTMLVideoElement | null>) {
+  const internalVideoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = externalVideoRef || internalVideoRef;
+
   const [isSupported] = useState(
     () => !!(navigator.mediaDevices?.getUserMedia)
   );
@@ -15,7 +18,6 @@ export function useCamera() {
   const [error, setError] = useState<string | null>(null);
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string>('');
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   // List available cameras
   const listCameras = useCallback(async () => {
@@ -89,28 +91,54 @@ export function useCamera() {
   }, [stream]);
 
   const captureSnapshot = useCallback((): string | null => {
-    if (videoRef.current) {
+    try {
+      if (!videoRef.current) {
+        console.error('Video ref not available');
+        return null;
+      }
+
+      if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
+        console.error('Video dimensions invalid:', videoRef.current.videoWidth, videoRef.current.videoHeight);
+        return null;
+      }
+
       const canvas = document.createElement('canvas');
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(videoRef.current, 0, 0);
-        const snapshotUrl = canvas.toDataURL('image/jpeg');
-        setSnapshot(snapshotUrl);
-        return snapshotUrl;
+      
+      if (!ctx) {
+        console.error('Failed to get canvas context');
+        return null;
       }
+
+      ctx.drawImage(videoRef.current, 0, 0);
+      const snapshotUrl = canvas.toDataURL('image/jpeg', 0.95);
+      setSnapshot(snapshotUrl);
+      return snapshotUrl;
+    } catch (err) {
+      console.error('Failed to capture snapshot:', err);
+      return null;
     }
-    return null;
   }, []);
 
   const downloadSnapshot = useCallback((snapshotUrl: string) => {
-    const link = document.createElement('a');
-    link.href = snapshotUrl;
-    link.download = `snapshot-${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const link = document.createElement('a');
+      link.href = snapshotUrl;
+      link.download = `snapshot-${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`;
+      link.style.display = 'none';
+      
+      document.body.appendChild(link);
+      
+      // Trigger download
+      setTimeout(() => {
+        link.click();
+        document.body.removeChild(link);
+      }, 0);
+    } catch (err) {
+      console.error('Failed to download snapshot:', err);
+    }
   }, []);
 
   return {
