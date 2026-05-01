@@ -112,7 +112,10 @@ export function useCamera(externalVideoRef?: React.MutableRefObject<HTMLVideoEle
         return null;
       }
 
-      ctx.drawImage(videoRef.current, 0, 0);
+      // Flip horizontally (mirror/unflip camera front view)
+      ctx.scale(-1, 1);
+      ctx.drawImage(videoRef.current, -canvas.width, 0);
+      
       const snapshotUrl = canvas.toDataURL('image/jpeg', 0.95);
       setSnapshot(snapshotUrl);
       return snapshotUrl;
