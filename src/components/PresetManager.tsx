@@ -19,6 +19,7 @@ export default function PresetManager({
   const [presets, setPresets] = useState<Preset[]>([]);
   const [presetName, setPresetName] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editingPresetName, setEditingPresetName] = useState<string | null>(null);
 
   // Load presets from localStorage
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function PresetManager({
     alert(`✅ Preset "${presetName}" saved!`);
   };
 
-  // Load preset
+  // Load preset and mark as editing
   const handleLoadPreset = (preset: Preset) => {
     onStateChange({
       candidateProfile: preset.candidateProfile,
@@ -72,6 +73,28 @@ export default function PresetManager({
       language: preset.language,
       wordLimit: preset.wordLimit,
     });
+    setEditingPresetName(preset.presetName);
+  };
+
+  // Update current editing preset
+  const handleUpdatePreset = () => {
+    if (!editingPresetName) return;
+
+    const updatedPreset: Preset = {
+      presetName: editingPresetName,
+      candidateProfile: state.candidateProfile || '',
+      jobDescription: state.jobDescription || '',
+      extraInstructions: state.extraInstructions || '',
+      language: state.language || 'en',
+      wordLimit: state.wordLimit || 120,
+    };
+
+    const updated = presets.map((p) =>
+      p.presetName === editingPresetName ? updatedPreset : p
+    );
+    savePresetsToStorage(updated);
+    alert(`✅ Preset "${editingPresetName}" updated!`);
+    setEditingPresetName(null);
   };
 
   // Delete preset
@@ -185,8 +208,26 @@ export default function PresetManager({
         </div>
       </div>
 
-      {/* Save Preset Form */}
-      {showForm ? (
+      {/* Edit or Save Form */}
+      {editingPresetName ? (
+        <div className="flex gap-1 p-1.5 bg-yellow-600/20 border border-yellow-600/50 rounded">
+          <span className="flex-1 text-yellow-300 text-xs flex items-center px-1">
+            ✏️ Editing: {editingPresetName}
+          </span>
+          <button
+            onClick={handleUpdatePreset}
+            className="px-2 py-1 bg-yellow-600/20 border border-yellow-600/50 hover:bg-yellow-600/30 text-yellow-400 rounded text-xs transition font-medium"
+          >
+            💾 Update
+          </button>
+          <button
+            onClick={() => setEditingPresetName(null)}
+            className="px-2 py-1 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded text-xs transition"
+          >
+            ✕
+          </button>
+        </div>
+      ) : showForm ? (
         <div className="flex gap-1">
           <input
             type="text"
@@ -227,18 +268,30 @@ export default function PresetManager({
           {presets.map((preset) => (
             <div
               key={preset.presetName}
-              className="flex items-center gap-1 p-1 bg-gray-700/20 border border-gray-600/30 rounded text-xs group hover:bg-gray-700/30 transition"
+              className={`flex items-center gap-1 p-1 rounded text-xs group transition ${
+                editingPresetName === preset.presetName
+                  ? 'bg-yellow-600/30 border border-yellow-600/50'
+                  : 'bg-gray-700/20 border border-gray-600/30 hover:bg-gray-700/30'
+              }`}
             >
               <button
                 onClick={() => handleLoadPreset(preset)}
-                className="flex-1 text-left px-1.5 py-0.5 text-gray-300 hover:text-blue-400 truncate"
+                className={`flex-1 text-left px-1.5 py-0.5 truncate ${
+                  editingPresetName === preset.presetName
+                    ? 'text-yellow-300 font-semibold'
+                    : 'text-gray-300 hover:text-blue-400'
+                }`}
                 title={preset.presetName}
               >
                 {preset.presetName}
               </button>
               <button
                 onClick={() => handleDeletePreset(preset.presetName)}
-                className="px-1 py-0.5 text-gray-500 hover:text-red-400 transition opacity-0 group-hover:opacity-100"
+                className={`px-1 py-0.5 transition opacity-0 group-hover:opacity-100 ${
+                  editingPresetName === preset.presetName
+                    ? 'opacity-100 text-gray-500'
+                    : 'text-gray-500 hover:text-red-400'
+                }`}
               >
                 ✕
               </button>
