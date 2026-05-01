@@ -4,6 +4,16 @@ export interface InterviewState {
   extraInstructions: string;
   language: 'en' | 'es';
   wordLimit: number;
+  attachments?: AttachedFile[];
+}
+
+export interface AttachedFile {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  dataUrl?: string;
+  addedAt: Date;
 }
 
 export interface InterviewMessage {
@@ -21,6 +31,7 @@ export interface GenerateAnswerParams {
   wordLimit: number;
   question: string;
   mode?: 'default' | 'shorter' | 'technical' | 'natural';
+  attachments?: AttachedFile[];
 }
 
 export interface CameraContextType {

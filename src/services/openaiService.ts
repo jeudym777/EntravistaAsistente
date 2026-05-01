@@ -18,6 +18,7 @@ export async function generateInterviewAnswer(
     wordLimit,
     question,
     mode = 'default',
+    attachments,
   } = params;
 
   // Build additional mode instructions
@@ -28,6 +29,20 @@ export async function generateInterviewAnswer(
     modeInstruction = 'Make the answer more technical and specific.';
   } else if (mode === 'natural') {
     modeInstruction = 'Make the answer more conversational and natural.';
+  }
+
+  // Build attachments context
+  let attachmentsContext = '';
+  if (attachments && attachments.length > 0) {
+    attachmentsContext = `\n\nContexto de Archivos Adjuntos:\n`;
+    attachments.forEach((file) => {
+      if (file.type.startsWith('image/')) {
+        attachmentsContext += `- Imagen: ${file.name} (${file.size} bytes) - El candidato ha compartido una imagen como referencia visual\n`;
+      } else if (file.type === 'application/pdf') {
+        attachmentsContext += `- Documento PDF: ${file.name} (${file.size} bytes) - El candidato ha compartido un documento como referencia\n`;
+      }
+    });
+    attachmentsContext += 'Considera estos archivos adjuntos como contexto adicional para enriquecer tu respuesta.';
   }
 
   const systemPrompt = `Actúa como un copiloto de entrevistas para el candidato.
@@ -42,6 +57,7 @@ ${jobDescription}
 
 Instrucciones adicionales:
 ${extraInstructions || 'Ninguna'}
+${attachmentsContext}
 
 Idioma de respuesta:
 ${language === 'es' ? 'Español' : 'English'}

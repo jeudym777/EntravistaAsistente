@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import type { InterviewState, InterviewMessage } from '../types/index';
+import type { InterviewState, InterviewMessage, AttachedFile } from '../types/index';
 import { generateInterviewAnswer } from '../services/openaiService';
 import AudioControls from './AudioControls';
+import FileUploadArea from './FileUploadArea';
 
 interface InterviewChatProps {
   state: InterviewState;
@@ -18,6 +19,7 @@ export default function InterviewChat({
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [transcriptToSend, setTranscriptToSend] = useState('');
+  const [attachments, setAttachments] = useState<AttachedFile[]>([]);
 
   const lastAnswer = messages.filter((m) => m.type === 'answer').pop();
 
@@ -63,6 +65,7 @@ export default function InterviewChat({
         wordLimit: state.wordLimit,
         question: questionToUse,
         mode,
+        attachments: attachments.length > 0 ? attachments : undefined,
       });
 
       const answerId = 'a-' + Date.now();
@@ -167,6 +170,17 @@ export default function InterviewChat({
               setManualQuestion(transcriptToSend);
             }
           }}
+        />
+      </div>
+
+      {/* File Upload Area */}
+      <div className="border-t border-gray-700 p-6 bg-gray-800">
+        <FileUploadArea
+          attachments={attachments}
+          onAddAttachment={(file) => setAttachments([...attachments, file])}
+          onRemoveAttachment={(fileId) =>
+            setAttachments(attachments.filter((a) => a.id !== fileId))
+          }
         />
       </div>
 
