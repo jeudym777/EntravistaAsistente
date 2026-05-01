@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { InterviewState } from '../types/index';
 import CameraPanel from './CameraPanel';
+import PresetManager from './PresetManager';
 
 const DEFAULT_CANDIDATE_PROFILE = `YEUDI MARTÍNEZ SÁNCHEZ
 Computer Engineer
@@ -141,6 +142,11 @@ export default function InterviewSetup({
           className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
         />
         <p className="text-xs text-gray-400 mt-1">Default: 120 words</p>
+      </div>
+
+      {/* Preset Manager */}
+      <div className="mb-6">
+        <PresetManager state={state} onStateChange={onStateChange} />
       </div>
 
       {/* Candidate Profile */}
