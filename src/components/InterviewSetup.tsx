@@ -130,6 +130,29 @@ export default function InterviewSetup({
         </select>
       </div>
 
+      {/* AI Model Selector */}
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
+          🤖 GPT Model
+        </label>
+        <select
+          value={state.model || 'gpt-4o-mini'}
+          onChange={(e) =>
+            onStateChange({ model: e.target.value as 'gpt-4o' | 'gpt-4o-mini' | 'gpt-4-turbo' })
+          }
+          className="w-full px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200"
+        >
+          <option value="gpt-4o">⚡ GPT-4o (Best Quality, Slower)</option>
+          <option value="gpt-4o-mini">⚖️ GPT-4o Mini (Balanced - Default)</option>
+          <option value="gpt-4-turbo">🚀 GPT-4 Turbo (Faster, Good Quality)</option>
+        </select>
+        <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+          <span className="block">• <strong>GPT-4o:</strong> Superior image/PDF understanding, better reasoning (slower/expensive)</span>
+          <span className="block">• <strong>GPT-4o Mini:</strong> Great balance of speed and quality (recommended)</span>
+          <span className="block">• <strong>GPT-4 Turbo:</strong> Fast responses, good for most interviews</span>
+        </p>
+      </div>
+
       {/* Word Limit */}
       <div>
         <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">

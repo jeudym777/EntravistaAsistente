@@ -4,6 +4,7 @@ export interface InterviewState {
   extraInstructions: string;
   language: 'en' | 'es';
   wordLimit: number;
+  model?: 'gpt-4o' | 'gpt-4o-mini' | 'gpt-4-turbo';
   attachments?: AttachedFile[];
 }
 
@@ -29,6 +30,7 @@ export interface GenerateAnswerParams {
   extraInstructions: string;
   language: 'en' | 'es';
   wordLimit: number;
+  model?: 'gpt-4o' | 'gpt-4o-mini' | 'gpt-4-turbo';
   question: string;
   mode?: 'default' | 'shorter' | 'technical' | 'natural';
   attachments?: AttachedFile[];

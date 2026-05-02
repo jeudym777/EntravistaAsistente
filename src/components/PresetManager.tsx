@@ -53,6 +53,7 @@ export default function PresetManager({
       extraInstructions: state.extraInstructions || '',
       language: state.language || 'en',
       wordLimit: state.wordLimit || 120,
+      model: state.model || 'gpt-4o-mini',
     };
 
     const updated = presets.filter((p) => p.presetName !== presetName.trim());
@@ -72,6 +73,7 @@ export default function PresetManager({
       extraInstructions: preset.extraInstructions,
       language: preset.language,
       wordLimit: preset.wordLimit,
+      model: preset.model || 'gpt-4o-mini',
     });
     setEditingPresetName(preset.presetName);
   };
@@ -87,6 +89,7 @@ export default function PresetManager({
       extraInstructions: state.extraInstructions || '',
       language: state.language || 'en',
       wordLimit: state.wordLimit || 120,
+      model: state.model || 'gpt-4o-mini',
     };
 
     const updated = presets.map((p) =>
@@ -116,6 +119,7 @@ export default function PresetManager({
       'Preset Name',
       'Language',
       'Word Limit',
+      'Model',
       'Candidate Profile',
       'Job Description',
       'Extra Instructions',
@@ -125,6 +129,7 @@ export default function PresetManager({
       `"${p.presetName.replace(/"/g, '""')}"`,
       `"${p.language}"`,
       `"${p.wordLimit}"`,
+      `"${p.model || 'gpt-4o-mini'}"`,
       `"${(p.candidateProfile || '').replace(/"/g, '""')}"`,
       `"${(p.jobDescription || '').replace(/"/g, '""')}"`,
       `"${(p.extraInstructions || '').replace(/"/g, '""')}"`,
@@ -319,15 +324,20 @@ function parseCSV(csvText: string): Preset[] {
 
   while (i < dataLines.length) {
     const row = parseCSVRow(dataLines, i);
-    if (row.values && row.values.length >= 6) {
+    if (row.values && row.values.length >= 7) {
       const language = (row.values[1] || 'en').toLowerCase() === 'es' ? 'es' : 'en';
+      const model = ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo'].includes(row.values[3]?.trim() || '')
+        ? (row.values[3]?.trim() as 'gpt-4o' | 'gpt-4o-mini' | 'gpt-4-turbo')
+        : 'gpt-4o-mini';
+      
       const preset: Preset = {
         presetName: row.values[0]?.trim() || 'Unnamed',
         language,
         wordLimit: parseInt(row.values[2] || '120', 10) || 120,
-        candidateProfile: row.values[3]?.trim() || '',
-        jobDescription: row.values[4]?.trim() || '',
-        extraInstructions: row.values[5]?.trim() || '',
+        model,
+        candidateProfile: row.values[4]?.trim() || '',
+        jobDescription: row.values[5]?.trim() || '',
+        extraInstructions: row.values[6]?.trim() || '',
       };
       
       // Only add if has a name

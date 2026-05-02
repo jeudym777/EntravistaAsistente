@@ -16,6 +16,7 @@ export async function generateInterviewAnswer(
     extraInstructions,
     language,
     wordLimit,
+    model = 'gpt-4o-mini',
     question,
     mode = 'default',
     attachments,
@@ -99,7 +100,7 @@ Genera la mejor respuesta posible.`;
         'Authorization': `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: model,
         messages: [
           {
             role: 'system',

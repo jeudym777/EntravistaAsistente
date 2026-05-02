@@ -10,6 +10,7 @@ function App() {
     extraInstructions: '',
     language: 'en',
     wordLimit: 120,
+    model: 'gpt-4o-mini',
   });
 
   const [messages, setMessages] = useState<InterviewMessage[]>([]);

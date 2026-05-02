@@ -67,6 +67,7 @@ export default function InterviewChat({
         extraInstructions: state.extraInstructions,
         language: state.language,
         wordLimit: state.wordLimit,
+        model: state.model || 'gpt-4o-mini',
         question: questionToUse,
         mode,
         attachments: attachments.length > 0 ? attachments : undefined,
