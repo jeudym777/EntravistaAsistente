@@ -108,8 +108,8 @@ export default function InterviewSetup({
     }
   }, []);
   return (
-    <div className="w-1/2 bg-black border-l border-gray-700 p-4 overflow-y-auto">
-      <h2 className="text-lg font-semibold text-white mb-4">Setup</h2>
+    <div className="p-4 space-y-4">
+      <h2 className="text-lg font-semibold text-white">Setup</h2>
 
       {/* Language Selector */}
       <div className="mb-3">

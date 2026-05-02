@@ -8,12 +8,16 @@ interface InterviewChatProps {
   state: InterviewState;
   messages: InterviewMessage[];
   onAddMessage: (message: InterviewMessage) => void;
+  onToggleSetup: () => void;
+  isSetupOpen: boolean;
 }
 
 export default function InterviewChat({
   state,
   messages,
   onAddMessage,
+  onToggleSetup,
+  isSetupOpen,
 }: InterviewChatProps) {
   const [manualQuestion, setManualQuestion] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -104,11 +108,24 @@ export default function InterviewChat({
   };
 
   return (
-    <div className="w-1/2 bg-gray-800 flex flex-col h-screen">
-      {/* Header - Minimal */}
-      <div className="border-b border-gray-700 p-4">
-        <h1 className="text-2xl font-semibold text-white">Interview</h1>
-        <p className="text-gray-400 text-xs mt-1">AI-powered practice</p>
+    <div className="w-full bg-gray-800 flex flex-col h-screen">
+      {/* Header - Minimal with Setup Toggle */}
+      <div className="border-b border-gray-700 p-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">Interview</h1>
+          <p className="text-gray-400 text-xs mt-1">AI-powered practice</p>
+        </div>
+        <button
+          onClick={onToggleSetup}
+          className={`px-3 py-2 rounded text-lg transition ${
+            isSetupOpen
+              ? 'bg-blue-600/30 border border-blue-600/50 text-blue-400'
+              : 'bg-gray-700/30 border border-gray-600/50 hover:bg-gray-700/50 text-gray-400'
+          }`}
+          title="Toggle Setup Panel"
+        >
+          ⚙️
+        </button>
       </div>
 
       {/* Chat History */}
