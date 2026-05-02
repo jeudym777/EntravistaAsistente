@@ -76,6 +76,7 @@ export default function CameraPanel() {
             autoPlay
             playsInline
             className="w-full h-full object-cover"
+            style={{ transform: 'scaleX(-1)' }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-800/50">
