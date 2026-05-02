@@ -210,8 +210,8 @@ export default function InterviewChat({
         </div>
       )}
 
-      {/* Input Section - Modern bottom bar - Responsive */}
-      <div className="border-t border-gray-700/50 bg-gray-900/50 backdrop-blur-sm px-3 md:px-6 py-3 md:py-4 space-y-2 md:space-y-3 max-h-[50vh] overflow-y-auto">
+      {/* Input Section - Compact bottom bar */}
+      <div className="border-t border-gray-700/50 bg-gray-900/50 backdrop-blur-sm px-2 md:px-4 py-2 md:py-2.5 space-y-1.5 max-h-[45vh] overflow-y-auto">
         {/* Audio Controls */}
         <AudioControls
           language={state.language}
@@ -234,8 +234,8 @@ export default function InterviewChat({
           }
         />
 
-        {/* Message Input - Modern */}
-        <div className="space-y-2">
+        {/* Message Input - Compact */}
+        <div className="space-y-1">
           <textarea
             value={manualQuestion}
             onChange={(e) => setManualQuestion(e.target.value)}
@@ -244,23 +244,23 @@ export default function InterviewChat({
                 handleGenerateAnswer(manualQuestion, 'default');
               }
             }}
-            placeholder="Type your question... (Ctrl+Enter to send)"
-            className="w-full h-14 md:h-16 px-3 md:px-4 py-2 md:py-3 bg-gray-800/50 border border-gray-600/30 hover:border-gray-600/50 focus:border-blue-500/50 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 resize-none"
+            placeholder="Question... (Ctrl+Enter)"
+            className="w-full h-10 md:h-12 px-2 md:px-3 py-1.5 md:py-2 bg-gray-800/50 border border-gray-600/30 hover:border-gray-600/50 focus:border-blue-500/50 rounded text-white placeholder-gray-500 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 resize-none"
           />
           
-          {/* Action Buttons */}
-          <div className="flex gap-2">
+          {/* Action Buttons - Compact */}
+          <div className="flex gap-1.5">
             <button
               onClick={() => handleGenerateAnswer(manualQuestion, 'default')}
               disabled={isGenerating || !manualQuestion.trim()}
-              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
+              className="flex-1 px-2 md:px-3 py-1.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 text-white rounded text-xs font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
             >
-              {isGenerating ? '⏳ Generating...' : '✨ Generate Answer'}
+              {isGenerating ? '⏳' : '✨'} Answer
             </button>
             {manualQuestion.trim() && (
               <button
                 onClick={() => setManualQuestion('')}
-                className="px-3 py-2.5 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 hover:text-gray-300 rounded-lg transition-all duration-200"
+                className="px-1.5 md:px-2 py-1.5 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 hover:text-gray-300 rounded transition-all duration-200 text-xs"
               >
                 ✕
               </button>
@@ -268,41 +268,40 @@ export default function InterviewChat({
           </div>
         </div>
 
-        {/* Answer Modification Options - Enhanced */}
+        {/* Answer Modification Options - Compact */}
         {lastAnswer && !isGenerating && (
-          <div className="space-y-2 pt-2 border-t border-gray-700/50">
-            <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Regenerate</p>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1 pt-1.5 border-t border-gray-700/50">
+            <div className="grid grid-cols-3 gap-1">
               <button
                 onClick={() => handleRegenerateMode('shorter')}
                 disabled={isGenerating}
-                className="px-3 py-2 bg-amber-600/15 border border-amber-600/30 hover:border-amber-600/50 hover:bg-amber-600/20 disabled:opacity-50 text-amber-400 rounded-lg text-xs font-semibold transition-all duration-200"
-                title="Generate shorter answer"
+                className="px-2 py-1 bg-amber-600/15 border border-amber-600/30 hover:border-amber-600/50 hover:bg-amber-600/20 disabled:opacity-50 text-amber-400 rounded text-xs font-semibold transition-all duration-200"
+                title="Shorter"
               >
-                📉 Shorter
+                📉
               </button>
               <button
                 onClick={() => handleRegenerateMode('technical')}
                 disabled={isGenerating}
-                className="px-3 py-2 bg-cyan-600/15 border border-cyan-600/30 hover:border-cyan-600/50 hover:bg-cyan-600/20 disabled:opacity-50 text-cyan-400 rounded-lg text-xs font-semibold transition-all duration-200"
-                title="Generate technical version"
+                className="px-2 py-1 bg-cyan-600/15 border border-cyan-600/30 hover:border-cyan-600/50 hover:bg-cyan-600/20 disabled:opacity-50 text-cyan-400 rounded text-xs font-semibold transition-all duration-200"
+                title="Technical"
               >
-                ⚙️ Technical
+                ⚙️
               </button>
               <button
                 onClick={() => handleRegenerateMode('natural')}
                 disabled={isGenerating}
-                className="px-3 py-2 bg-pink-600/15 border border-pink-600/30 hover:border-pink-600/50 hover:bg-pink-600/20 disabled:opacity-50 text-pink-400 rounded-lg text-xs font-semibold transition-all duration-200"
-                title="Generate natural version"
+                className="px-2 py-1 bg-pink-600/15 border border-pink-600/30 hover:border-pink-600/50 hover:bg-pink-600/20 disabled:opacity-50 text-pink-400 rounded text-xs font-semibold transition-all duration-200"
+                title="Natural"
               >
-                💬 Natural
+                💬
               </button>
             </div>
             <button
               onClick={copyToClipboard}
-              className="w-full px-4 py-2 bg-green-600/15 border border-green-600/30 hover:border-green-600/50 hover:bg-green-600/20 text-green-400 rounded-lg text-xs font-semibold transition-all duration-200"
+              className="w-full px-2 py-1.5 bg-green-600/15 border border-green-600/30 hover:border-green-600/50 hover:bg-green-600/20 text-green-400 rounded text-xs font-semibold transition-all duration-200"
             >
-              📋 Copy Answer
+              📋 Copy
             </button>
           </div>
         )}
