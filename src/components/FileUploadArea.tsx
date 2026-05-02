@@ -40,6 +40,7 @@ export default function FileUploadArea({
         type: file.type,
         size: file.size,
         dataUrl: file.type.startsWith('image/') ? (e.target?.result as string) : undefined,
+        blob: file,
         addedAt: new Date(),
       };
       onAddAttachment(attachedFile);
@@ -54,6 +55,7 @@ export default function FileUploadArea({
         name: file.name,
         type: file.type,
         size: file.size,
+        blob: file,
         addedAt: new Date(),
       };
       onAddAttachment(attachedFile);

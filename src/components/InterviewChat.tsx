@@ -3,6 +3,7 @@ import type { InterviewState, InterviewMessage, AttachedFile } from '../types/in
 import { generateInterviewAnswer } from '../services/openaiService';
 import AudioControls from './AudioControls';
 import FileUploadArea from './FileUploadArea';
+import MessageRenderer from './MessageRenderer';
 
 interface InterviewChatProps {
   state: InterviewState;
@@ -159,13 +160,11 @@ export default function InterviewChat({
                     ? 'bg-blue-600/10 border border-blue-600/30 hover:border-blue-600/50'
                     : 'bg-green-600/10 border border-green-600/30 hover:border-green-600/50'
                 }`}>
-                  <p className={`text-sm leading-relaxed ${
-                    msg.type === 'question'
-                      ? 'text-gray-200'
-                      : 'text-gray-100'
-                  }`}>
-                    {msg.content}
-                  </p>
+                  {msg.type === 'question' ? (
+                    <p className="text-sm leading-relaxed text-gray-200">{msg.content}</p>
+                  ) : (
+                    <MessageRenderer content={msg.content} />
+                  )}
                 </div>
                 
                 {/* Timestamp */}

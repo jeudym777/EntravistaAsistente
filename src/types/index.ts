@@ -14,6 +14,7 @@ export interface AttachedFile {
   type: string;
   size: number;
   dataUrl?: string;
+  blob?: Blob;
   addedAt: Date;
 }
 

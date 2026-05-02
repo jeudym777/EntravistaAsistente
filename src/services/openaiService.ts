@@ -7,6 +7,22 @@ if (!API_KEY) {
   console.warn('⚠️ VITE_OPENAI_API_KEY not found in environment variables');
 }
 
+// Helper function to convert blob to base64
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result.split(',')[1]); // Get only the base64 part
+      } else {
+        reject(new Error('Failed to convert blob to base64'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 export async function generateInterviewAnswer(
   params: GenerateAnswerParams
 ): Promise<string> {
@@ -32,17 +48,40 @@ export async function generateInterviewAnswer(
     modeInstruction = 'Make the answer more conversational and natural.';
   }
 
-  // Build attachments context
+  // Build attachments context and collect image data
   let attachmentsContext = '';
+  let imageContent: any[] = [];
+  
   if (attachments && attachments.length > 0) {
     attachmentsContext = `\n\nContexto de Archivos Adjuntos:\n`;
-    attachments.forEach((file) => {
+    
+    for (const file of attachments) {
       if (file.type.startsWith('image/')) {
-        attachmentsContext += `- Imagen: ${file.name} (${file.size} bytes) - El candidato ha compartido una imagen como referencia visual\n`;
+        attachmentsContext += `- Imagen: ${file.name} - El candidato ha compartido una imagen con código o referencia visual\n`;
+        try {
+          let imageUrl = '';
+          if (file.blob) {
+            const base64 = await blobToBase64(file.blob);
+            imageUrl = `data:${file.type};base64,${base64}`;
+          } else if (file.dataUrl) {
+            imageUrl = file.dataUrl;
+          }
+          
+          if (imageUrl) {
+            imageContent.push({
+              type: 'image_url',
+              image_url: {
+                url: imageUrl,
+              },
+            });
+          }
+        } catch (err) {
+          console.error(`Failed to process image ${file.name}:`, err);
+        }
       } else if (file.type === 'application/pdf') {
-        attachmentsContext += `- Documento PDF: ${file.name} (${file.size} bytes) - El candidato ha compartido un documento como referencia\n`;
+        attachmentsContext += `- Documento PDF: ${file.name} - El candidato ha compartido un documento como referencia\n`;
       }
-    });
+    }
     attachmentsContext += 'Considera estos archivos adjuntos como contexto adicional para enriquecer tu respuesta.';
   }
 
@@ -85,12 +124,43 @@ Reglas:
 - Prioriza claridad, seguridad y humildad.
 - No menciones que eres una IA.
 - No digas "como modelo de lenguaje".
-- La respuesta debe sonar lista para decirse en una entrevista real.`;
+- La respuesta debe sonar lista para decirse en una entrevista real.
+- Usa markdown para formatear mejor las respuestas cuando sea apropiado:
+  - Usa **negrita** para destacar conceptos clave
+  - Usa bloques de código con triple backtick para mostrar ejemplos de código
+  - Usa listas numeradas o con viñetas para desglosar puntos
+  - Usa saltos de línea entre párrafos para mejorar legibilidad`;
 
-  const userPrompt = `Pregunta del entrevistador:
+  // Build user message content
+  let userMessageContent: any = {
+    type: 'text',
+    text: `Pregunta del entrevistador:
 ${question}
 
-Genera la mejor respuesta posible.`;
+Genera la mejor respuesta posible.`,
+  };
+
+  // If we have images, build a content array
+  const messages: any[] = [
+    {
+      role: 'system',
+      content: systemPrompt,
+    },
+  ];
+
+  if (imageContent.length > 0) {
+    // Add user message with images
+    messages.push({
+      role: 'user',
+      content: [userMessageContent, ...imageContent],
+    });
+  } else {
+    // Add regular user message
+    messages.push({
+      role: 'user',
+      content: userMessageContent.text,
+    });
+  }
 
   try {
     const response = await fetch(API_URL, {
@@ -101,16 +171,7 @@ Genera la mejor respuesta posible.`;
       },
       body: JSON.stringify({
         model: model,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: userPrompt,
-          },
-        ],
+        messages: messages,
         temperature: 0.5,
         max_tokens: Math.max(300, wordLimit * 2),
       }),
