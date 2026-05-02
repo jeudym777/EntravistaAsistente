@@ -69,13 +69,13 @@ export default function CameraPanel() {
       )}
 
       {/* Video Preview - Responsive */}
-      <div className="rounded-lg overflow-hidden bg-gray-900/50 border border-gray-600/30 h-24 md:h-32 shadow-lg">
+      <div className="rounded-lg overflow-hidden bg-gray-900/50 border border-gray-600/30 h-24 md:h-32 shadow-lg flex items-center justify-center">
         {isEnabled && stream ? (
           <video
             ref={videoRef}
             autoPlay
             playsInline
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             style={{ transform: 'scaleX(-1)' }}
           />
         ) : (
