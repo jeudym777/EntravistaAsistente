@@ -90,7 +90,7 @@ export function useCamera(externalVideoRef?: React.MutableRefObject<HTMLVideoEle
     }
   }, [stream]);
 
-  const captureSnapshot = useCallback((): string | null => {
+  const captureSnapshot = useCallback((zoom: number = 1): string | null => {
     try {
       if (!videoRef.current) {
         console.error('Video ref not available');
@@ -112,9 +112,13 @@ export function useCamera(externalVideoRef?: React.MutableRefObject<HTMLVideoEle
         return null;
       }
 
-      // Flip horizontally (mirror/unflip camera front view)
-      ctx.scale(-1, 1);
-      ctx.drawImage(videoRef.current, -canvas.width, 0);
+      // Apply flip and zoom centered on canvas
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.scale(-zoom, zoom);
+      ctx.translate(-canvas.width / 2, -canvas.height / 2);
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
       
       const snapshotUrl = canvas.toDataURL('image/jpeg', 0.95);
       setSnapshot(snapshotUrl);

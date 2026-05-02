@@ -35,7 +35,7 @@ export default function CameraPanel() {
 
   const handleCapture = () => {
     try {
-      const snapshotUrl = captureSnapshot();
+      const snapshotUrl = captureSnapshot(zoom);
       if (snapshotUrl) {
         downloadSnapshot(snapshotUrl);
       } else {
