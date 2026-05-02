@@ -108,8 +108,8 @@ export default function InterviewSetup({
     }
   }, []);
   return (
-    <div className="p-6 space-y-6 bg-gradient-to-b from-gray-900 to-gray-900/80">
-      <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+    <div className="space-y-4 md:space-y-6 bg-gradient-to-b from-gray-900 to-gray-900/80">
+      <h2 className="text-lg md:text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
         Configuration
       </h2>
 
@@ -183,7 +183,7 @@ export default function InterviewSetup({
           value={state.candidateProfile}
           onChange={(e) => onStateChange({ candidateProfile: e.target.value })}
           placeholder="Your CV, skills, experience, education, projects..."
-          className="w-full h-24 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
+          className="w-full h-20 md:h-24 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
         />
       </div>
 
@@ -196,7 +196,7 @@ export default function InterviewSetup({
           value={state.jobDescription}
           onChange={(e) => onStateChange({ jobDescription: e.target.value })}
           placeholder="Position details, responsibilities, requirements..."
-          className="w-full h-24 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
+          className="w-full h-20 md:h-24 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
         />
       </div>
 
@@ -211,7 +211,7 @@ export default function InterviewSetup({
             onStateChange({ extraInstructions: e.target.value })
           }
           placeholder="Interview tips, tone, language level, format preferences..."
-          className="w-full h-20 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
+          className="w-full h-16 md:h-20 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
         />
       </div>
 

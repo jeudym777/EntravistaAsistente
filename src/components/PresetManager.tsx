@@ -187,14 +187,14 @@ export default function PresetManager({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 md:space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">🎯 Presets</p>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1 md:gap-1.5">
           <button
             onClick={handleExportCSV}
             disabled={presets.length === 0}
-            className="p-2 bg-green-600/15 border border-green-600/40 hover:border-green-600/60 hover:bg-green-600/20 disabled:opacity-40 disabled:cursor-not-allowed text-green-400 rounded-lg text-sm transition-all duration-200"
+            className="p-1.5 md:p-2 bg-green-600/15 border border-green-600/40 hover:border-green-600/60 hover:bg-green-600/20 disabled:opacity-40 disabled:cursor-not-allowed text-green-400 rounded-lg text-xs md:text-sm transition-all duration-200"
             title="Export presets as CSV"
           >
             📥
@@ -206,7 +206,7 @@ export default function PresetManager({
               onChange={handleImportCSV}
               className="hidden"
             />
-            <span className="p-2 bg-purple-600/15 border border-purple-600/40 hover:border-purple-600/60 hover:bg-purple-600/20 text-purple-400 rounded-lg text-sm transition-all duration-200 inline-block">
+            <span className="p-1.5 md:p-2 bg-purple-600/15 border border-purple-600/40 hover:border-purple-600/60 hover:bg-purple-600/20 text-purple-400 rounded-lg text-xs md:text-sm transition-all duration-200 inline-block">
               📤
             </span>
           </label>

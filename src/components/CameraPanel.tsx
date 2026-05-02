@@ -68,8 +68,8 @@ export default function CameraPanel() {
         </div>
       )}
 
-      {/* Video Preview */}
-      <div className="rounded-lg overflow-hidden bg-gray-900/50 border border-gray-600/30 h-32 shadow-lg">
+      {/* Video Preview - Responsive */}
+      <div className="rounded-lg overflow-hidden bg-gray-900/50 border border-gray-600/30 h-24 md:h-32 shadow-lg">
         {isEnabled && stream ? (
           <video
             ref={videoRef}
@@ -79,31 +79,31 @@ export default function CameraPanel() {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-800/50">
-            <p className="text-gray-500 text-2xl">📷</p>
+            <p className="text-gray-500 text-xl md:text-2xl">📷</p>
           </div>
         )}
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="p-3 bg-red-600/10 border border-red-600/30 rounded-lg text-red-300 text-xs font-medium">
+        <div className="p-2 md:p-3 bg-red-600/10 border border-red-600/30 rounded-lg text-red-300 text-xs font-medium">
           {error}
         </div>
       )}
 
-      {/* Snapshot Preview */}
+      {/* Snapshot Preview - Responsive */}
       {snapshot && (
-        <div className="rounded-lg overflow-hidden bg-gray-900/50 border border-gray-600/30 h-24 shadow-md">
+        <div className="rounded-lg overflow-hidden bg-gray-900/50 border border-gray-600/30 h-20 md:h-24 shadow-md">
           <img src={snapshot} alt="Snapshot" className="w-full h-full object-cover" />
         </div>
       )}
 
-      {/* Camera Controls */}
+      {/* Camera Controls - Responsive */}
       <div className="flex gap-2 pt-1">
         {!isEnabled ? (
           <button
             onClick={enableCamera}
-            className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
+            className="flex-1 px-2 md:px-3 py-2.5 md:py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
           >
             📷 Enable Camera
           </button>
@@ -111,13 +111,13 @@ export default function CameraPanel() {
           <>
             <button
               onClick={handleCapture}
-              className="flex-1 px-3 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/40"
+              className="flex-1 px-2 md:px-3 py-2.5 md:py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/40"
             >
               📸 Capture
             </button>
             <button
               onClick={disableCamera}
-              className="flex-1 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/40"
+              className="flex-1 px-2 md:px-3 py-2.5 md:py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/40"
             >
               Disable
             </button>

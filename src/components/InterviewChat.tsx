@@ -110,17 +110,17 @@ export default function InterviewChat({
 
   return (
     <div className="w-full bg-gradient-to-b from-gray-900 via-gray-850 to-gray-900 flex flex-col h-screen">
-      {/* Header - Modern with subtle gradient */}
-      <div className="border-b border-gray-700/50 px-6 py-4 flex items-center justify-between bg-gray-900/50 backdrop-blur-sm">
-        <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+      {/* Header - Modern with subtle gradient - Responsive */}
+      <div className="border-b border-gray-700/50 px-3 md:px-6 py-3 md:py-4 flex items-center justify-between bg-gray-900/50 backdrop-blur-sm">
+        <div className="min-w-0">
+          <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent truncate">
             Interview
           </h1>
-          <p className="text-gray-500 text-xs mt-1 font-medium tracking-wide">AI-powered practice</p>
+          <p className="text-gray-500 text-xs mt-0.5 md:mt-1 font-medium tracking-wide hidden md:block">AI-powered practice</p>
         </div>
         <button
           onClick={onToggleSetup}
-          className={`px-3 py-2 rounded-lg text-lg transition-all duration-200 ${
+          className={`ml-2 md:ml-4 px-3 md:px-3 py-2.5 md:py-2 rounded-lg text-base md:text-lg transition-all duration-200 flex-shrink-0 ${
             isSetupOpen
               ? 'bg-blue-600/20 border border-blue-600/50 text-blue-400 shadow-lg shadow-blue-500/20'
               : 'bg-gray-700/20 border border-gray-600/30 hover:bg-gray-700/40 text-gray-400 hover:text-gray-300'
@@ -131,8 +131,8 @@ export default function InterviewChat({
         </button>
       </div>
 
-      {/* Chat Messages - Enhanced bubbles */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+      {/* Chat Messages - Enhanced bubbles - Responsive */}
+      <div className="flex-1 overflow-y-auto px-3 md:px-6 py-3 md:py-4 space-y-3 md:space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -210,8 +210,8 @@ export default function InterviewChat({
         </div>
       )}
 
-      {/* Input Section - Modern bottom bar */}
-      <div className="border-t border-gray-700/50 bg-gray-900/50 backdrop-blur-sm px-6 py-4 space-y-3">
+      {/* Input Section - Modern bottom bar - Responsive */}
+      <div className="border-t border-gray-700/50 bg-gray-900/50 backdrop-blur-sm px-3 md:px-6 py-3 md:py-4 space-y-2 md:space-y-3 max-h-[50vh] overflow-y-auto">
         {/* Audio Controls */}
         <AudioControls
           language={state.language}
@@ -245,7 +245,7 @@ export default function InterviewChat({
               }
             }}
             placeholder="Type your question... (Ctrl+Enter to send)"
-            className="w-full h-16 px-4 py-3 bg-gray-800/50 border border-gray-600/30 hover:border-gray-600/50 focus:border-blue-500/50 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 resize-none"
+            className="w-full h-14 md:h-16 px-3 md:px-4 py-2 md:py-3 bg-gray-800/50 border border-gray-600/30 hover:border-gray-600/50 focus:border-blue-500/50 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 resize-none"
           />
           
           {/* Action Buttons */}

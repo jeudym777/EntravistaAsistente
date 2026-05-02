@@ -101,12 +101,12 @@ export default function AudioControls({
         </div>
       )}
 
-      {/* Controls */}
+      {/* Controls - Responsive button sizing */}
       <div className="flex gap-2 items-center">
         {!isRecording && !isTranscribing ? (
           <button
             onClick={startRecording}
-            className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/40"
+            className="flex-1 px-3 md:px-4 py-2.5 md:py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/40"
           >
             🎤 Record
           </button>
@@ -114,7 +114,7 @@ export default function AudioControls({
           <button
             onClick={stopRecording}
             disabled={isTranscribing}
-            className="flex-1 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/40 disabled:shadow-none disabled:opacity-50"
+            className="flex-1 px-3 md:px-4 py-2.5 md:py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg text-xs md:text-sm font-semibold transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/40 disabled:shadow-none disabled:opacity-50"
           >
             ⏹️ Stop Recording
           </button>
@@ -122,7 +122,7 @@ export default function AudioControls({
         {transcript && !isRecording && !isTranscribing && (
           <button
             onClick={resetTranscript}
-            className="px-3 py-2 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 hover:text-gray-300 rounded-lg transition-all duration-200 font-medium"
+            className="px-2.5 md:px-3 py-2.5 md:py-2 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 hover:text-gray-300 rounded-lg transition-all duration-200 font-medium"
             title="Clear transcript"
           >
             ✕
