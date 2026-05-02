@@ -182,15 +182,15 @@ export default function PresetManager({
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-xs font-semibold text-gray-400">📋 Presets</p>
-        <div className="flex gap-1">
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">🎯 Presets</p>
+        <div className="flex gap-1.5">
           <button
             onClick={handleExportCSV}
             disabled={presets.length === 0}
-            className="px-1.5 py-0.5 bg-green-600/20 border border-green-600/50 hover:bg-green-600/30 disabled:opacity-50 text-green-400 rounded text-xs transition"
-            title="Export CSV"
+            className="p-2 bg-green-600/15 border border-green-600/40 hover:border-green-600/60 hover:bg-green-600/20 disabled:opacity-40 disabled:cursor-not-allowed text-green-400 rounded-lg text-sm transition-all duration-200"
+            title="Export presets as CSV"
           >
             📥
           </button>
@@ -201,7 +201,7 @@ export default function PresetManager({
               onChange={handleImportCSV}
               className="hidden"
             />
-            <span className="px-1.5 py-0.5 bg-purple-600/20 border border-purple-600/50 hover:bg-purple-600/30 text-purple-400 rounded text-xs transition inline-block">
+            <span className="p-2 bg-purple-600/15 border border-purple-600/40 hover:border-purple-600/60 hover:bg-purple-600/20 text-purple-400 rounded-lg text-sm transition-all duration-200 inline-block">
               📤
             </span>
           </label>
@@ -210,36 +210,37 @@ export default function PresetManager({
 
       {/* Edit or Save Form */}
       {editingPresetName ? (
-        <div className="flex gap-1 p-1.5 bg-yellow-600/20 border border-yellow-600/50 rounded">
-          <span className="flex-1 text-yellow-300 text-xs flex items-center px-1">
-            ✏️ Editing: {editingPresetName}
-          </span>
-          <button
-            onClick={handleUpdatePreset}
-            className="px-2 py-1 bg-yellow-600/20 border border-yellow-600/50 hover:bg-yellow-600/30 text-yellow-400 rounded text-xs transition font-medium"
-          >
-            💾 Update
-          </button>
-          <button
-            onClick={() => setEditingPresetName(null)}
-            className="px-2 py-1 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded text-xs transition"
-          >
-            ✕
-          </button>
+        <div className="p-3 bg-yellow-600/10 border border-yellow-600/30 rounded-lg space-y-2">
+          <p className="text-yellow-300 text-xs font-semibold">✏️ Editing: <span className="font-bold">{editingPresetName}</span></p>
+          <div className="flex gap-2">
+            <button
+              onClick={handleUpdatePreset}
+              className="flex-1 px-3 py-2 bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-500 hover:to-yellow-600 text-white rounded-lg text-xs font-semibold transition-all duration-200"
+            >
+              💾 Update
+            </button>
+            <button
+              onClick={() => setEditingPresetName(null)}
+              className="px-3 py-2 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded-lg transition-all duration-200"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       ) : showForm ? (
-        <div className="flex gap-1">
+        <div className="flex gap-2">
           <input
             type="text"
             value={presetName}
             onChange={(e) => setPresetName(e.target.value)}
-            placeholder="Name..."
-            className="flex-1 px-2 py-1 bg-gray-700/50 border border-gray-600/50 rounded text-white text-xs focus:outline-none focus:border-gray-500"
+            placeholder="Preset name..."
+            className="flex-1 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200"
             onKeyPress={(e) => e.key === 'Enter' && handleSavePreset()}
+            autoFocus
           />
           <button
             onClick={handleSavePreset}
-            className="px-2 py-1 bg-green-600/20 border border-green-600/50 hover:bg-green-600/30 text-green-400 rounded text-xs transition"
+            className="px-3 py-2 bg-green-600/20 border border-green-600/50 hover:bg-green-600/30 text-green-400 rounded-lg text-sm font-semibold transition-all duration-200"
           >
             ✓
           </button>
@@ -248,7 +249,7 @@ export default function PresetManager({
               setShowForm(false);
               setPresetName('');
             }}
-            className="px-2 py-1 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded text-xs transition"
+            className="px-3 py-2 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded-lg transition-all duration-200"
           >
             ✕
           </button>
@@ -256,47 +257,49 @@ export default function PresetManager({
       ) : (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full px-2 py-1 bg-blue-600/20 border border-blue-600/50 hover:bg-blue-600/30 text-blue-400 rounded text-xs font-medium transition"
+          className="w-full px-3 py-2 bg-blue-600/15 border border-blue-600/40 hover:border-blue-600/60 hover:bg-blue-600/20 text-blue-400 rounded-lg text-sm font-semibold transition-all duration-200"
         >
-          💾 Save
+          💾 Save Current Config
         </button>
       )}
 
-      {/* Presets List - Compact */}
+      {/* Presets List */}
       {presets.length > 0 && (
-        <div className="space-y-1 max-h-24 overflow-y-auto">
-          {presets.map((preset) => (
-            <div
-              key={preset.presetName}
-              className={`flex items-center gap-1 p-1 rounded text-xs group transition ${
-                editingPresetName === preset.presetName
-                  ? 'bg-yellow-600/30 border border-yellow-600/50'
-                  : 'bg-gray-700/20 border border-gray-600/30 hover:bg-gray-700/30'
-              }`}
-            >
-              <button
-                onClick={() => handleLoadPreset(preset)}
-                className={`flex-1 text-left px-1.5 py-0.5 truncate ${
+        <div className="space-y-1.5">
+          <p className="text-xs text-gray-500 font-medium">Saved presets:</p>
+          <div className="space-y-1 max-h-48 overflow-y-auto">
+            {presets.map((preset) => (
+              <div
+                key={preset.presetName}
+                className={`flex items-center gap-2 p-2 rounded-lg text-xs transition-all duration-200 group cursor-pointer ${
                   editingPresetName === preset.presetName
-                    ? 'text-yellow-300 font-semibold'
-                    : 'text-gray-300 hover:text-blue-400'
-                }`}
-                title={preset.presetName}
-              >
-                {preset.presetName}
-              </button>
-              <button
-                onClick={() => handleDeletePreset(preset.presetName)}
-                className={`px-1 py-0.5 transition opacity-0 group-hover:opacity-100 ${
-                  editingPresetName === preset.presetName
-                    ? 'opacity-100 text-gray-500'
-                    : 'text-gray-500 hover:text-red-400'
+                    ? 'bg-yellow-600/15 border border-yellow-600/40'
+                    : 'bg-gray-700/20 border border-gray-600/30 hover:border-gray-600/60 hover:bg-gray-700/30'
                 }`}
               >
-                ✕
-              </button>
-            </div>
-          ))}
+                <button
+                  onClick={() => handleLoadPreset(preset)}
+                  className={`flex-1 text-left px-2 py-1 truncate font-medium transition-colors duration-200 ${
+                    editingPresetName === preset.presetName
+                      ? 'text-yellow-300'
+                      : 'text-gray-300 hover:text-blue-400'
+                  }`}
+                  title={preset.presetName}
+                >
+                  {preset.presetName}
+                </button>
+                <button
+                  onClick={() => handleDeletePreset(preset.presetName)}
+                  className={`px-2 py-1 text-gray-500 hover:text-red-400 transition-all duration-200 opacity-0 group-hover:opacity-100 ${
+                    editingPresetName === preset.presetName ? 'opacity-100' : ''
+                  }`}
+                  title="Delete preset"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

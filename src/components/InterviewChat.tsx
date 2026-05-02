@@ -108,19 +108,21 @@ export default function InterviewChat({
   };
 
   return (
-    <div className="w-full bg-gray-800 flex flex-col h-screen">
-      {/* Header - Minimal with Setup Toggle */}
-      <div className="border-b border-gray-700 p-4 flex items-center justify-between">
+    <div className="w-full bg-gradient-to-b from-gray-900 via-gray-850 to-gray-900 flex flex-col h-screen">
+      {/* Header - Modern with subtle gradient */}
+      <div className="border-b border-gray-700/50 px-6 py-4 flex items-center justify-between bg-gray-900/50 backdrop-blur-sm">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Interview</h1>
-          <p className="text-gray-400 text-xs mt-1">AI-powered practice</p>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            Interview
+          </h1>
+          <p className="text-gray-500 text-xs mt-1 font-medium tracking-wide">AI-powered practice</p>
         </div>
         <button
           onClick={onToggleSetup}
-          className={`px-3 py-2 rounded text-lg transition ${
+          className={`px-3 py-2 rounded-lg text-lg transition-all duration-200 ${
             isSetupOpen
-              ? 'bg-blue-600/30 border border-blue-600/50 text-blue-400'
-              : 'bg-gray-700/30 border border-gray-600/50 hover:bg-gray-700/50 text-gray-400'
+              ? 'bg-blue-600/20 border border-blue-600/50 text-blue-400 shadow-lg shadow-blue-500/20'
+              : 'bg-gray-700/20 border border-gray-600/30 hover:bg-gray-700/40 text-gray-400 hover:text-gray-300'
           }`}
           title="Toggle Setup Panel"
         >
@@ -128,100 +130,136 @@ export default function InterviewChat({
         </button>
       </div>
 
-      {/* Chat History */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      {/* Chat Messages - Enhanced bubbles */}
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500 text-sm text-center">
-              Start by asking a question
-            </p>
+            <div className="text-center">
+              <p className="text-gray-500 text-sm font-medium mb-2">Start your interview practice</p>
+              <p className="text-gray-600 text-xs">Ask a question or record your answer</p>
+            </div>
           </div>
         ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className="animate-fadeIn">
-              {msg.type === 'question' ? (
-                <div className="bg-gray-700/30 border-l-2 border-blue-500/50 p-3 rounded text-sm">
-                  <p className="text-gray-400 text-xs mb-1">❓</p>
-                  <p className="text-gray-200">{msg.content}</p>
+          messages.map((msg, idx) => (
+            <div key={msg.id} className="flex gap-3 animate-fadeIn" style={{ animationDelay: `${idx * 50}ms` }}>
+              {/* Avatar */}
+              <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
+                msg.type === 'question'
+                  ? 'bg-blue-600/20 border border-blue-600/50 text-blue-400'
+                  : 'bg-green-600/20 border border-green-600/50 text-green-400'
+              }`}>
+                {msg.type === 'question' ? '👤' : '🤖'}
+              </div>
+
+              {/* Message Bubble */}
+              <div className="flex-1 group">
+                <div className={`rounded-lg px-4 py-3 transition-all duration-200 ${
+                  msg.type === 'question'
+                    ? 'bg-blue-600/10 border border-blue-600/30 hover:border-blue-600/50'
+                    : 'bg-green-600/10 border border-green-600/30 hover:border-green-600/50'
+                }`}>
+                  <p className={`text-sm leading-relaxed ${
+                    msg.type === 'question'
+                      ? 'text-gray-200'
+                      : 'text-gray-100'
+                  }`}>
+                    {msg.content}
+                  </p>
                 </div>
-              ) : (
-                <div className="bg-gray-700/30 border-l-2 border-green-500/50 p-3 rounded text-sm">
-                  <p className="text-gray-400 text-xs mb-1">💡</p>
-                  <p className="text-gray-100 leading-relaxed">{msg.content}</p>
-                </div>
-              )}
+                
+                {/* Timestamp */}
+                <p className="text-gray-600 text-xs mt-1 px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
             </div>
           ))
         )}
+
+        {/* Generating Indicator */}
+        {isGenerating && (
+          <div className="flex gap-3 animate-fadeIn">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold bg-purple-600/20 border border-purple-600/50 text-purple-400">
+              🤖
+            </div>
+            <div className="flex-1">
+              <div className="rounded-lg px-4 py-3 bg-purple-600/10 border border-purple-600/30">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    {[0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce"
+                        style={{ animationDelay: `${i * 0.1}s` }}
+                      ></div>
+                    ))}
+                  </div>
+                  <span className="text-purple-300 text-xs font-medium">Generating response...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Error Display - Compact */}
+      {/* Error Alert - Improved */}
       {error && (
-        <div className="mx-4 mb-2 p-2 bg-red-900/20 border border-red-700/50 rounded text-red-300 text-xs">
-          {error}
+        <div className="mx-6 mb-4 p-3 bg-red-600/10 border border-red-600/30 rounded-lg text-red-300 text-sm font-medium animate-pulse">
+          ⚠️ {error}
         </div>
       )}
 
-      {/* Generate Indicator - Compact */}
-      {isGenerating && (
-        <div className="mx-4 mb-2 flex items-center gap-1 p-2 bg-purple-900/20 border border-purple-700/50 rounded">
-          <div className="flex gap-0.5">
-            <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse"></div>
-            <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-          </div>
-          <span className="text-purple-400 text-xs font-medium">Generating...</span>
-        </div>
-      )}
-
-      {/* Bottom Section - Compact */}
-      <div className="border-t border-gray-700 bg-gray-800 space-y-2 p-4">
+      {/* Input Section - Modern bottom bar */}
+      <div className="border-t border-gray-700/50 bg-gray-900/50 backdrop-blur-sm px-6 py-4 space-y-3">
         {/* Audio Controls */}
-        <div>
-          <AudioControls
-            language={state.language}
-            onTranscriptChange={(transcript) => {
-              setTranscriptToSend(transcript);
-            }}
-            onTranscriptFinalized={() => {
-              if (transcriptToSend.trim()) {
-                setManualQuestion(transcriptToSend);
-              }
-            }}
-          />
-        </div>
+        <AudioControls
+          language={state.language}
+          onTranscriptChange={(transcript) => {
+            setTranscriptToSend(transcript);
+          }}
+          onTranscriptFinalized={() => {
+            if (transcriptToSend.trim()) {
+              setManualQuestion(transcriptToSend);
+            }
+          }}
+        />
 
         {/* File Upload */}
-        <div>
-          <FileUploadArea
-            attachments={attachments}
-            onAddAttachment={(file) => setAttachments([...attachments, file])}
-            onRemoveAttachment={(fileId) =>
-              setAttachments(attachments.filter((a) => a.id !== fileId))
-            }
-          />
-        </div>
+        <FileUploadArea
+          attachments={attachments}
+          onAddAttachment={(file) => setAttachments([...attachments, file])}
+          onRemoveAttachment={(fileId) =>
+            setAttachments(attachments.filter((a) => a.id !== fileId))
+          }
+        />
 
-        {/* Manual Question Input - Compact */}
-        <div className="space-y-1">
+        {/* Message Input - Modern */}
+        <div className="space-y-2">
           <textarea
             value={manualQuestion}
             onChange={(e) => setManualQuestion(e.target.value)}
-            placeholder="Type question..."
-            className="w-full h-16 px-3 py-2 bg-gray-700/50 border border-gray-600/50 rounded text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-500 resize-none"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.ctrlKey) {
+                handleGenerateAnswer(manualQuestion, 'default');
+              }
+            }}
+            placeholder="Type your question... (Ctrl+Enter to send)"
+            className="w-full h-16 px-4 py-3 bg-gray-800/50 border border-gray-600/30 hover:border-gray-600/50 focus:border-blue-500/50 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 resize-none"
           />
+          
+          {/* Action Buttons */}
           <div className="flex gap-2">
             <button
               onClick={() => handleGenerateAnswer(manualQuestion, 'default')}
               disabled={isGenerating || !manualQuestion.trim()}
-              className="flex-1 px-3 py-2 bg-blue-600/20 border border-blue-600/50 hover:bg-blue-600/30 disabled:opacity-50 text-blue-400 rounded text-sm font-medium transition"
+              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40"
             >
-              ✨ Generate
+              {isGenerating ? '⏳ Generating...' : '✨ Generate Answer'}
             </button>
             {manualQuestion.trim() && (
               <button
                 onClick={() => setManualQuestion('')}
-                className="px-2 py-2 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded transition"
+                className="px-3 py-2.5 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 hover:text-gray-300 rounded-lg transition-all duration-200"
               >
                 ✕
               </button>
@@ -229,40 +267,41 @@ export default function InterviewChat({
           </div>
         </div>
 
-        {/* Answer Modification Buttons - Compact */}
-        {lastAnswer && (
-          <div className="space-y-1 pt-1 border-t border-gray-700">
-            <div className="grid grid-cols-3 gap-1">
+        {/* Answer Modification Options - Enhanced */}
+        {lastAnswer && !isGenerating && (
+          <div className="space-y-2 pt-2 border-t border-gray-700/50">
+            <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Regenerate</p>
+            <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => handleRegenerateMode('shorter')}
                 disabled={isGenerating}
-                className="px-2 py-1 bg-amber-600/20 border border-amber-600/50 hover:bg-amber-600/30 disabled:opacity-50 text-amber-400 rounded text-xs font-medium transition"
-                title="Shorter"
+                className="px-3 py-2 bg-amber-600/15 border border-amber-600/30 hover:border-amber-600/50 hover:bg-amber-600/20 disabled:opacity-50 text-amber-400 rounded-lg text-xs font-semibold transition-all duration-200"
+                title="Generate shorter answer"
               >
-                📉
+                📉 Shorter
               </button>
               <button
                 onClick={() => handleRegenerateMode('technical')}
                 disabled={isGenerating}
-                className="px-2 py-1 bg-cyan-600/20 border border-cyan-600/50 hover:bg-cyan-600/30 disabled:opacity-50 text-cyan-400 rounded text-xs font-medium transition"
-                title="Technical"
+                className="px-3 py-2 bg-cyan-600/15 border border-cyan-600/30 hover:border-cyan-600/50 hover:bg-cyan-600/20 disabled:opacity-50 text-cyan-400 rounded-lg text-xs font-semibold transition-all duration-200"
+                title="Generate technical version"
               >
-                ⚙️
+                ⚙️ Technical
               </button>
               <button
                 onClick={() => handleRegenerateMode('natural')}
                 disabled={isGenerating}
-                className="px-2 py-1 bg-pink-600/20 border border-pink-600/50 hover:bg-pink-600/30 disabled:opacity-50 text-pink-400 rounded text-xs font-medium transition"
-                title="Natural"
+                className="px-3 py-2 bg-pink-600/15 border border-pink-600/30 hover:border-pink-600/50 hover:bg-pink-600/20 disabled:opacity-50 text-pink-400 rounded-lg text-xs font-semibold transition-all duration-200"
+                title="Generate natural version"
               >
-                💬
+                💬 Natural
               </button>
             </div>
             <button
               onClick={copyToClipboard}
-              className="w-full px-2 py-1 bg-green-600/20 border border-green-600/50 hover:bg-green-600/30 text-green-400 rounded text-xs font-medium transition"
+              className="w-full px-4 py-2 bg-green-600/15 border border-green-600/30 hover:border-green-600/50 hover:bg-green-600/20 text-green-400 rounded-lg text-xs font-semibold transition-all duration-200"
             >
-              📋 Copy
+              📋 Copy Answer
             </button>
           </div>
         )}

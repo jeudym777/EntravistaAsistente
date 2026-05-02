@@ -43,62 +43,70 @@ export default function AudioControls({
 
   if (!isSupported) {
     return (
-      <div className="p-4 bg-yellow-900/30 border border-yellow-700 rounded-lg text-yellow-300 text-sm">
+      <div className="p-3 bg-yellow-600/10 border border-yellow-600/30 rounded-lg text-yellow-300 text-sm font-medium">
         ⚠️ Audio recording not supported in your browser. Use manual input instead.
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Permission/Error Display */}
       {error && (
-        <div className="p-3 bg-red-900/20 border border-red-700/50 rounded text-red-400 text-xs">
-          <p className="font-medium">🔐 {error}</p>
-          <p className="text-red-400/70 mt-1">
-            💡 Click 🔒 next to URL and enable microphone
+        <div className="p-3 bg-red-600/10 border border-red-600/30 rounded-lg">
+          <p className="text-red-300 font-semibold text-sm">🔐 Microphone Permission Needed</p>
+          <p className="text-red-400/70 text-xs mt-1">
+            Click 🔒 next to the URL and enable microphone access
           </p>
         </div>
       )}
 
-      {/* Recording Status Compact */}
+      {/* Recording Status */}
       {isRecording && (
-        <div className="flex items-center gap-2 p-2 bg-blue-900/20 border border-blue-700/50 rounded text-sm">
+        <div className="flex items-center gap-2 p-2.5 bg-blue-600/10 border border-blue-600/30 rounded-lg">
           <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              ></div>
+            ))}
           </div>
-          <span className="text-blue-400 text-xs font-medium">Recording • ⏱️ {recordingTime}s</span>
+          <span className="text-blue-300 text-xs font-semibold">Recording • ⏱️ {recordingTime}s / 120s</span>
         </div>
       )}
 
       {/* Transcribing Status */}
       {isTranscribing && (
-        <div className="flex items-center gap-2 p-2 bg-purple-900/20 border border-purple-700/50 rounded text-sm">
+        <div className="flex items-center gap-2 p-2.5 bg-purple-600/10 border border-purple-600/30 rounded-lg">
           <div className="flex gap-1">
-            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse"></div>
-            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              ></div>
+            ))}
           </div>
-          <span className="text-purple-400 text-xs font-medium">Transcribing...</span>
+          <span className="text-purple-300 text-xs font-semibold">Transcribing with Whisper...</span>
         </div>
       )}
 
       {/* Transcript Preview */}
       {transcript && !isRecording && !isTranscribing && (
-        <div className="p-3 bg-green-900/20 border border-green-700/50 rounded text-sm">
-          <p className="text-green-400 text-xs font-semibold mb-1">✓ Captured</p>
-          <p className="text-gray-300 text-xs leading-relaxed">{transcript}</p>
+        <div className="p-3 bg-green-600/10 border border-green-600/30 rounded-lg">
+          <p className="text-green-400 text-xs font-semibold mb-1.5">✓ Transcript Captured</p>
+          <p className="text-gray-200 text-sm leading-relaxed line-clamp-3">{transcript}</p>
         </div>
       )}
 
-      {/* Controls - Compact */}
+      {/* Controls */}
       <div className="flex gap-2 items-center">
         {!isRecording && !isTranscribing ? (
           <button
             onClick={startRecording}
-            className="flex-1 px-3 py-2 bg-green-600/20 border border-green-600/50 hover:bg-green-600/30 text-green-400 rounded text-sm font-medium transition"
+            className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/40"
           >
             🎤 Record
           </button>
@@ -106,16 +114,16 @@ export default function AudioControls({
           <button
             onClick={stopRecording}
             disabled={isTranscribing}
-            className="flex-1 px-3 py-2 bg-red-600/20 border border-red-600/50 hover:bg-red-600/30 disabled:opacity-50 text-red-400 rounded text-sm font-medium transition"
+            className="flex-1 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/40 disabled:shadow-none disabled:opacity-50"
           >
-            ⏹️ Stop
+            ⏹️ Stop Recording
           </button>
         )}
         {transcript && !isRecording && !isTranscribing && (
           <button
             onClick={resetTranscript}
-            className="px-2 py-2 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 rounded transition"
-            title="Clear"
+            className="px-3 py-2 bg-gray-700/30 hover:bg-gray-700/50 text-gray-400 hover:text-gray-300 rounded-lg transition-all duration-200 font-medium"
+            title="Clear transcript"
           >
             ✕
           </button>

@@ -108,30 +108,32 @@ export default function InterviewSetup({
     }
   }, []);
   return (
-    <div className="p-4 space-y-4">
-      <h2 className="text-lg font-semibold text-white">Setup</h2>
+    <div className="p-6 space-y-6 bg-gradient-to-b from-gray-900 to-gray-900/80">
+      <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+        Configuration
+      </h2>
 
       {/* Language Selector */}
-      <div className="mb-3">
-        <label className="block text-xs font-semibold text-gray-400 mb-1">
-          Language
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
+          🌐 Language
         </label>
         <select
           value={state.language}
           onChange={(e) =>
             onStateChange({ language: e.target.value as 'en' | 'es' })
           }
-          className="w-full px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white text-sm focus:outline-none focus:border-gray-500"
+          className="w-full px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200"
         >
-          <option value="en">English</option>
-          <option value="es">Español</option>
+          <option value="en">🇺🇸 English</option>
+          <option value="es">🇪🇸 Español</option>
         </select>
       </div>
 
       {/* Word Limit */}
-      <div className="mb-3">
-        <label className="block text-xs font-semibold text-gray-400 mb-1">
-          Word Limit
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
+          📝 Word Limit
         </label>
         <input
           type="number"
@@ -139,58 +141,60 @@ export default function InterviewSetup({
           max="500"
           value={state.wordLimit}
           onChange={(e) => onStateChange({ wordLimit: parseInt(e.target.value) })}
-          className="w-full px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white text-sm focus:outline-none focus:border-gray-500"
+          className="w-full px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200"
         />
+        <p className="text-xs text-gray-500 mt-1">Target: {state.wordLimit} words per answer</p>
       </div>
 
       {/* Preset Manager */}
-      <div className="mb-4 border-t border-gray-700 pt-3">
+      <div className="border-t border-gray-700/50 pt-4">
         <PresetManager state={state} onStateChange={onStateChange} />
       </div>
 
       {/* Candidate Profile */}
-      <div className="mb-3">
-        <label className="block text-xs font-semibold text-gray-400 mb-1">
-          Candidate Profile
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
+          👤 Candidate Profile
         </label>
         <textarea
           value={state.candidateProfile}
           onChange={(e) => onStateChange({ candidateProfile: e.target.value })}
-          placeholder="Paste your CV..."
-          className="w-full h-20 px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-gray-500 resize-none"
+          placeholder="Your CV, skills, experience, education, projects..."
+          className="w-full h-24 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
         />
       </div>
 
       {/* Job Description */}
-      <div className="mb-3">
-        <label className="block text-xs font-semibold text-gray-400 mb-1">
-          Job Description
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
+          💼 Job Description
         </label>
         <textarea
           value={state.jobDescription}
           onChange={(e) => onStateChange({ jobDescription: e.target.value })}
-          placeholder="Paste the job description..."
-          className="w-full h-20 px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-gray-500 resize-none"
+          placeholder="Position details, responsibilities, requirements..."
+          className="w-full h-24 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
         />
       </div>
 
       {/* Extra Instructions */}
-      <div className="mb-4">
-        <label className="block text-xs font-semibold text-gray-400 mb-1">
-          Extra Instructions
+      <div>
+        <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">
+          ⚡ Extra Instructions
         </label>
         <textarea
           value={state.extraInstructions}
           onChange={(e) =>
             onStateChange({ extraInstructions: e.target.value })
           }
-          placeholder="Additional context or instructions..."
-          className="w-full h-16 px-2 py-1.5 bg-gray-700/50 border border-gray-600/50 rounded text-white placeholder-gray-500 text-xs focus:outline-none focus:border-gray-500 resize-none"
+          placeholder="Interview tips, tone, language level, format preferences..."
+          className="w-full h-20 px-3 py-2 bg-gray-700/40 border border-gray-600/40 hover:border-gray-600/60 rounded-lg text-white placeholder-gray-500/70 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-200 resize-none"
         />
       </div>
 
       {/* Camera Panel */}
-      <div className="border-t border-gray-700 pt-3">
+      <div className="border-t border-gray-700/50 pt-4">
+        <p className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wide">📷 Optional: Camera</p>
         <CameraPanel />
       </div>
     </div>

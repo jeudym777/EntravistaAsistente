@@ -100,15 +100,15 @@ export default function FileUploadArea({
 
   return (
     <div className="space-y-2">
-      {/* Upload Button & Drop Zone - Minimal */}
+      {/* Upload Zone - Modern drag and drop */}
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`relative border border-dashed rounded p-2 text-center transition cursor-pointer ${
+        className={`relative border-2 border-dashed rounded-lg p-3 transition-all duration-200 cursor-pointer ${
           isDragging
-            ? 'border-blue-500/50 bg-blue-900/10'
-            : 'border-gray-600/50 bg-gray-800/10 hover:border-gray-500/50'
+            ? 'border-blue-500 bg-blue-600/10 shadow-lg shadow-blue-500/20'
+            : 'border-gray-600/40 bg-gray-800/20 hover:border-gray-500/60 hover:bg-gray-800/30'
         }`}
       >
         <input
@@ -121,44 +121,50 @@ export default function FileUploadArea({
         />
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="w-full flex items-center justify-center gap-1 text-gray-400 hover:text-gray-300 transition text-sm"
+          className="w-full flex items-center justify-center gap-2 text-sm font-medium transition-colors duration-200"
         >
-          <span>➕</span>
-          <span>{isDragging ? 'Drop here' : 'Add files'}</span>
+          <span className={isDragging ? 'text-blue-400 text-lg' : 'text-gray-400 hover:text-gray-300'}>{isDragging ? '📥' : '📎'}</span>
+          <span className={isDragging ? 'text-blue-300 font-semibold' : 'text-gray-400 hover:text-gray-300'}>
+            {isDragging ? 'Drop files here' : 'Add files or drag & drop'}
+          </span>
         </button>
+        <p className="text-xs text-gray-500 text-center mt-1">Images or PDFs (max 20MB each)</p>
       </div>
 
-      {/* Attached Files List - Compact */}
+      {/* Attached Files List - Modern */}
       {attachments.length > 0 && (
-        <div className="space-y-1">
-          <p className="text-xs text-gray-500 pl-1">📎 {attachments.length} file(s)</p>
-          <div className="space-y-1 max-h-32 overflow-y-auto">
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">📎 Attached Files ({attachments.length})</p>
+          <div className="space-y-1 max-h-40 overflow-y-auto">
             {attachments.map((file) => (
               <div
                 key={file.id}
-                className="flex items-center gap-2 p-1.5 bg-gray-700/20 border border-gray-600/30 rounded text-xs group hover:bg-gray-700/30 transition"
+                className="flex items-center gap-2 p-2 bg-gray-700/20 border border-gray-600/30 hover:border-gray-600/50 rounded-lg text-xs group transition-all duration-200 hover:bg-gray-700/30"
               >
                 {/* Preview for images */}
-                {file.dataUrl && (
-                  <img
-                    src={file.dataUrl}
-                    alt={file.name}
-                    className="w-6 h-6 object-cover rounded"
-                  />
+                {file.dataUrl ? (
+                  <div className="flex-shrink-0 w-7 h-7 rounded-md overflow-hidden border border-gray-600/50">
+                    <img
+                      src={file.dataUrl}
+                      alt={file.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <span className="flex-shrink-0 w-7 h-7 flex items-center justify-center text-base">{getFileIcon(file.type)}</span>
                 )}
 
-                {/* Icon for PDFs */}
-                {!file.dataUrl && (
-                  <span className="text-sm">{getFileIcon(file.type)}</span>
-                )}
-
-                {/* File name only */}
-                <span className="text-gray-400 truncate text-xs flex-1">{file.name}</span>
+                {/* File info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-300 truncate font-medium">{file.name}</p>
+                  <p className="text-gray-500 text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
 
                 {/* Delete button */}
                 <button
                   onClick={() => onRemoveAttachment(file.id)}
-                  className="text-gray-500 hover:text-red-400 transition opacity-0 group-hover:opacity-100 text-xs"
+                  className="flex-shrink-0 p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-600/10 rounded-md transition-all duration-200 opacity-0 group-hover:opacity-100"
+                  title="Remove file"
                 >
                   ✕
                 </button>
