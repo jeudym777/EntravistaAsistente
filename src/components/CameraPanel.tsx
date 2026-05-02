@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useCamera } from '../hooks/useCamera';
 
 export default function CameraPanel() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [zoom, setZoom] = useState(1);
   const {
     isSupported,
     isEnabled,
@@ -23,6 +24,14 @@ export default function CameraPanel() {
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
+
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(prev + 0.2, 3));
+  };
+
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(prev - 0.2, 1));
+  };
 
   const handleCapture = () => {
     try {
@@ -76,7 +85,7 @@ export default function CameraPanel() {
             autoPlay
             playsInline
             className="w-full h-full object-contain"
-            style={{ transform: 'scaleX(-1)' }}
+            style={{ transform: `scaleX(-1) scale(${zoom})` }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-800/50">
@@ -84,6 +93,29 @@ export default function CameraPanel() {
           </div>
         )}
       </div>
+
+      {/* Zoom Controls - Only show when camera is enabled */}
+      {isEnabled && stream && (
+        <div className="flex items-center justify-between gap-1.5 p-1.5 bg-gray-800/30 border border-gray-600/30 rounded">
+          <button
+            onClick={handleZoomOut}
+            disabled={zoom <= 1}
+            className="px-2 py-1 bg-gray-700/30 hover:bg-gray-700/50 disabled:opacity-40 disabled:cursor-not-allowed text-gray-400 hover:text-gray-300 rounded text-xs transition-all"
+            title="Zoom out"
+          >
+            🔍−
+          </button>
+          <span className="text-xs text-gray-400 font-semibold min-w-12 text-center">{zoom.toFixed(1)}x</span>
+          <button
+            onClick={handleZoomIn}
+            disabled={zoom >= 3}
+            className="px-2 py-1 bg-gray-700/30 hover:bg-gray-700/50 disabled:opacity-40 disabled:cursor-not-allowed text-gray-400 hover:text-gray-300 rounded text-xs transition-all"
+            title="Zoom in"
+          >
+            🔍+
+          </button>
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
