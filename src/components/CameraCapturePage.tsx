@@ -8,6 +8,8 @@ interface ImageFilters {
   saturation: number;
   hue: number;
   blur: number;
+  exposureTime: number;
+  gain: number;
 }
 
 export default function CameraCapturePage() {
@@ -23,6 +25,8 @@ export default function CameraCapturePage() {
     saturation: 100,
     hue: 0,
     blur: 0,
+    exposureTime: 100,
+    gain: 100,
   });
 
   const {
@@ -125,6 +129,16 @@ export default function CameraCapturePage() {
       let g = data[i + 1];
       let b = data[i + 2];
 
+      // Exposure Time (controla la exposición general)
+      r = Math.min(255, (r * filters.exposureTime) / 100);
+      g = Math.min(255, (g * filters.exposureTime) / 100);
+      b = Math.min(255, (b * filters.exposureTime) / 100);
+
+      // Gain (amplifica la señal)
+      r = Math.min(255, (r * filters.gain) / 100);
+      g = Math.min(255, (g * filters.gain) / 100);
+      b = Math.min(255, (b * filters.gain) / 100);
+
       // Brightness
       r = Math.min(255, (r * filters.brightness) / 100);
       g = Math.min(255, (g * filters.brightness) / 100);
@@ -216,6 +230,8 @@ export default function CameraCapturePage() {
       saturation: 100,
       hue: 0,
       blur: 0,
+      exposureTime: 100,
+      gain: 100,
     });
   };
 
@@ -537,6 +553,50 @@ export default function CameraCapturePage() {
               onChange={(e) => setFilters({ ...filters, blur: parseFloat(e.target.value) })}
               className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
             />
+          </div>
+
+          {/* Exposure Time */}
+          <div className="mb-5">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-xs font-semibold text-gray-300">⏱️ Exposure</label>
+              <span className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-orange-300">
+                {filters.exposureTime}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="200"
+              step="5"
+              value={filters.exposureTime}
+              onChange={(e) =>
+                setFilters({ ...filters, exposureTime: parseInt(e.target.value) })
+              }
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+            />
+            <p className="text-xs text-gray-500 mt-1">Controla la exposición de la cámara</p>
+          </div>
+
+          {/* Gain */}
+          <div className="mb-5">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-xs font-semibold text-gray-300">📈 Gain</label>
+              <span className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-red-300">
+                {filters.gain}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="200"
+              step="5"
+              value={filters.gain}
+              onChange={(e) =>
+                setFilters({ ...filters, gain: parseInt(e.target.value) })
+              }
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+            />
+            <p className="text-xs text-gray-500 mt-1">Amplifica la señal de la cámara</p>
           </div>
 
           {/* Filter Presets */}

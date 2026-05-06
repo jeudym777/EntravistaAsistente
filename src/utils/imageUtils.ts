@@ -9,6 +9,8 @@ export interface FilterPreset {
     saturation: number;
     hue: number;
     blur: number;
+    exposureTime: number;
+    gain: number;
   };
 }
 
@@ -22,6 +24,8 @@ export const FILTER_PRESETS: FilterPreset[] = [
       saturation: 100,
       hue: 0,
       blur: 0,
+      exposureTime: 100,
+      gain: 100,
     },
   },
   {
@@ -33,6 +37,8 @@ export const FILTER_PRESETS: FilterPreset[] = [
       saturation: 0,
       hue: 0,
       blur: 0,
+      exposureTime: 100,
+      gain: 100,
     },
   },
   {
@@ -44,6 +50,8 @@ export const FILTER_PRESETS: FilterPreset[] = [
       saturation: 80,
       hue: 30,
       blur: 0,
+      exposureTime: 100,
+      gain: 100,
     },
   },
   {
@@ -55,6 +63,8 @@ export const FILTER_PRESETS: FilterPreset[] = [
       saturation: 150,
       hue: 0,
       blur: 0,
+      exposureTime: 100,
+      gain: 100,
     },
   },
   {
@@ -66,6 +76,8 @@ export const FILTER_PRESETS: FilterPreset[] = [
       saturation: 100,
       hue: 240,
       blur: 0,
+      exposureTime: 100,
+      gain: 100,
     },
   },
   {
@@ -77,6 +89,8 @@ export const FILTER_PRESETS: FilterPreset[] = [
       saturation: 100,
       hue: 30,
       blur: 0,
+      exposureTime: 100,
+      gain: 100,
     },
   },
   {
@@ -88,6 +102,8 @@ export const FILTER_PRESETS: FilterPreset[] = [
       saturation: 90,
       hue: 0,
       blur: 1,
+      exposureTime: 100,
+      gain: 100,
     },
   },
   {
@@ -99,6 +115,8 @@ export const FILTER_PRESETS: FilterPreset[] = [
       saturation: 70,
       hue: 40,
       blur: 0,
+      exposureTime: 100,
+      gain: 100,
     },
   },
 ];
