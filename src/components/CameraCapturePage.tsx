@@ -15,6 +15,8 @@ export default function CameraCapturePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [zoom, setZoom] = useState(1);
   const [isMirrored, setIsMirrored] = useState(true);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
   const [filters, setFilters] = useState<ImageFilters>({
     brightness: 100,
     contrast: 100,
@@ -53,9 +55,12 @@ export default function CameraCapturePage() {
   }, [isSupported, isEnabled, enableCamera, disableCamera]);
 
   const getFilterStyle = () => {
+    const translatePart = zoom > 1 ? `translate(${panX}px, ${panY}px)` : '';
     return {
       filter: `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturation}%) hue-rotate(${filters.hue}deg) blur(${filters.blur}px)`,
-      transform: isMirrored ? `scaleX(-1) scale(${zoom})` : `scale(${zoom})`,
+      transform: isMirrored 
+        ? `scaleX(-1) scale(${zoom}) ${translatePart}` 
+        : `scale(${zoom}) ${translatePart}`,
     };
   };
 
@@ -214,6 +219,29 @@ export default function CameraCapturePage() {
     });
   };
 
+  const handlePan = (direction: 'up' | 'down' | 'left' | 'right') => {
+    const panSpeed = 20;
+    switch (direction) {
+      case 'up':
+        setPanY(prev => prev + panSpeed);
+        break;
+      case 'down':
+        setPanY(prev => prev - panSpeed);
+        break;
+      case 'left':
+        setPanX(prev => prev + panSpeed);
+        break;
+      case 'right':
+        setPanX(prev => prev - panSpeed);
+        break;
+    }
+  };
+
+  const handleResetPan = () => {
+    setPanX(0);
+    setPanY(0);
+  };
+
   if (!isSupported) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-black">
@@ -351,7 +379,66 @@ export default function CameraCapturePage() {
             </div>
           </div>
 
-          {/* Brightness */}
+          {/* Pan Controls - Only show when zoomed in */}
+          {zoom > 1 && (
+            <div className="mb-5 p-3 bg-gray-800/50 border border-gray-700 rounded-lg">
+              <div className="flex justify-between items-center mb-3">
+                <label className="text-xs font-semibold text-gray-300">📍 Desplazar</label>
+                <button
+                  onClick={handleResetPan}
+                  className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
+                >
+                  Resetear
+                </button>
+              </div>
+              {/* Arrow Buttons Grid */}
+              <div className="grid grid-cols-3 gap-2 mb-2">
+                {/* Empty cell */}
+                <div />
+                {/* Up Arrow */}
+                <button
+                  onClick={() => handlePan('up')}
+                  className="py-2 px-2 bg-blue-600/40 hover:bg-blue-600/60 text-blue-300 rounded transition-colors border border-blue-600/50 font-bold text-sm"
+                >
+                  ↑
+                </button>
+                {/* Empty cell */}
+                <div />
+                
+                {/* Left Arrow */}
+                <button
+                  onClick={() => handlePan('left')}
+                  className="py-2 px-2 bg-blue-600/40 hover:bg-blue-600/60 text-blue-300 rounded transition-colors border border-blue-600/50 font-bold text-sm"
+                >
+                  ←
+                </button>
+                {/* Center indicator */}
+                <div className="py-2 px-2 bg-gray-700/50 rounded text-center">
+                  <span className="text-xs text-gray-400">●</span>
+                </div>
+                {/* Right Arrow */}
+                <button
+                  onClick={() => handlePan('right')}
+                  className="py-2 px-2 bg-blue-600/40 hover:bg-blue-600/60 text-blue-300 rounded transition-colors border border-blue-600/50 font-bold text-sm"
+                >
+                  →
+                </button>
+                
+                {/* Empty cell */}
+                <div />
+                {/* Down Arrow */}
+                <button
+                  onClick={() => handlePan('down')}
+                  className="py-2 px-2 bg-blue-600/40 hover:bg-blue-600/60 text-blue-300 rounded transition-colors border border-blue-600/50 font-bold text-sm"
+                >
+                  ↓
+                </button>
+                {/* Empty cell */}
+                <div />
+              </div>
+              <p className="text-xs text-gray-400 text-center">Pan: {panX}, {panY}</p>
+            </div>
+          )}
           <div className="mb-5">
             <div className="flex justify-between items-center mb-2">
               <label className="text-xs font-semibold text-gray-300">☀️ Brillo</label>
