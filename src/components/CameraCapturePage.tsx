@@ -15,7 +15,6 @@ export default function CameraCapturePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [zoom, setZoom] = useState(1);
   const [isMirrored, setIsMirrored] = useState(true);
-  const [showPreview, setShowPreview] = useState(false);
   const [filters, setFilters] = useState<ImageFilters>({
     brightness: 100,
     contrast: 100,
@@ -28,12 +27,10 @@ export default function CameraCapturePage() {
     isSupported,
     isEnabled,
     stream,
-    snapshot,
     cameras,
     selectedCameraId,
     enableCamera,
     disableCamera,
-    downloadSnapshot,
     setSelectedCameraId,
     error,
   } = useCamera(videoRef);
@@ -107,9 +104,6 @@ export default function CameraCapturePage() {
           link.click();
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
-          
-          // Show preview
-          setShowPreview(true);
         }
       }, 'image/jpeg', 0.95);
     } catch (err) {
