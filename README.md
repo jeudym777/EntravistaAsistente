@@ -230,5 +230,5 @@ This tool is designed to help you practice interviews and prepare responses. How
 
 **Built with ❤️ for interview success**
 
-Questions or issues? Feel free to provide feedback!
+Questions or issues? Feel free to provide feedback! 🚀
 
